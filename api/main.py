@@ -1,0 +1,101 @@
+"""API ROUGE — sert le front (same-origin) et les endpoints /api/*.
+
+P1 : chaque endpoint sert la fixture démo api/demo/<dataset>.json dans
+l'enveloppe uniforme {"data": …, "meta": {"source", "asof", "stale"}}.
+P2 branchera dataset par dataset les vues DuckDB, avec stale=true quand
+on sert la dernière partition valide après échec de collecte.
+
+Dev : ./venv/bin/uvicorn api.main:app --reload  puis  http://localhost:8000
+"""
+
+from __future__ import annotations
+
+import json
+import os
+from datetime import datetime, timezone
+from pathlib import Path
+
+from dotenv import load_dotenv
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
+load_dotenv(REPO_ROOT / ".env")
+
+DEMO_DIR = Path(__file__).resolve().parent / "demo"
+FRONT_DIR = REPO_ROOT / "frontend"
+ROUGE_ENV = os.getenv("ROUGE_ENV", "dev")
+
+app = FastAPI(title="ROUGE API", version="0.1", docs_url="/api/docs" if ROUGE_ENV == "dev" else None)
+
+_origins = [
+    o.strip()
+    for o in os.getenv("ROUGE_CORS_ORIGINS", "http://localhost:8000,http://127.0.0.1:8000").split(",")
+    if o.strip()
+]
+app.add_middleware(
+    CORSMiddleware, allow_origins=_origins, allow_methods=["GET"], allow_headers=["*"]
+)
+
+
+def envelope(dataset: str) -> dict:
+    """Enveloppe uniforme. P1 : source démo, jamais stale."""
+    path = DEMO_DIR / f"{dataset}.json"
+    if not path.exists():
+        raise HTTPException(503, detail=f"fixture {dataset} absente — lancer scripts/extract_demo.py")
+    asof = datetime.fromtimestamp(path.stat().st_mtime, timezone.utc).isoformat(timespec="seconds")
+    return {
+        "data": json.loads(path.read_text(encoding="utf-8")),
+        "meta": {"source": "demo", "asof": asof, "stale": False},
+    }
+
+
+@app.get("/api/health")
+def health() -> dict:
+    return {"status": "ok", "env": ROUGE_ENV}
+
+
+@app.get("/api/monitor/layers")
+def monitor_layers() -> dict:
+    return envelope("layers")
+
+
+@app.get("/api/intel/cot")
+def intel_cot() -> dict:
+    return envelope("cot")
+
+
+@app.get("/api/intel/macro")
+def intel_macro() -> dict:
+    return envelope("macro")
+
+
+@app.get("/api/intel/trend")
+def intel_trend() -> dict:
+    return envelope("trend")
+
+
+@app.get("/api/intel/fx")
+def intel_fx() -> dict:
+    return envelope("fx")
+
+
+@app.get("/api/intel/markets")
+def intel_markets() -> dict:
+    return envelope("markets")
+
+
+@app.get("/api/intel/pm")
+def intel_pm() -> dict:
+    return envelope("pm")
+
+
+@app.get("/", include_in_schema=False)
+def index() -> FileResponse:
+    return FileResponse(FRONT_DIR / "rouge.html", media_type="text/html")
+
+
+# Monté en dernier : les routes /api/* déclarées au-dessus restent prioritaires.
+app.mount("/", StaticFiles(directory=FRONT_DIR), name="frontend")

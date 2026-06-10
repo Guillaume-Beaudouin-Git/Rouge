@@ -1,0 +1,66 @@
+[
+ {
+  "q": "La Fed baisse-t-elle ses taux en septembre ?",
+  "p": 62,
+  "d": 3,
+  "vol": "4.2 M$",
+  "lon": -77,
+  "lat": 38.9
+ },
+ {
+  "q": "Baisse BCE confirmée avant fin juillet ?",
+  "p": 34,
+  "d": -9,
+  "vol": "1.1 M$",
+  "lon": 8.7,
+  "lat": 50.1
+ },
+ {
+  "q": "Transit normal au détroit d’Ormuz fin T2 ?",
+  "p": 71,
+  "d": -4,
+  "vol": "2.7 M$",
+  "lon": 56.3,
+  "lat": 26.6
+ },
+ {
+  "q": "Brent > 95 $ d’ici le 31 août ?",
+  "p": 24,
+  "d": 2,
+  "vol": "1.8 M$",
+  "lon": 51.5,
+  "lat": 25.3
+ },
+ {
+  "q": "Récession US déclarée en 2026 ?",
+  "p": 17,
+  "d": -1,
+  "vol": "3.5 M$",
+  "lon": -74,
+  "lat": 40.7
+ },
+ {
+  "q": "BTC > 150 000 $ au 31 décembre ?",
+  "p": 33,
+  "d": 5,
+  "vol": "6.0 M$",
+  "lon": -122.4,
+  "lat": 37.8
+ },
+ {
+  "q": "Accord commercial UE-US signé avant T4 ?",
+  "p": 41,
+  "d": 0,
+  "vol": "0.9 M$",
+  "lon": 4.4,
+  "lat": 50.8
+ },
+ {
+  "q": "Élargissement du cessez-le-feu régional avant fin juin ?",
+  "p": 46,
+  "d": 6,
+  "vol": "2.2 M$",
+  "lon": 35.2,
+  "lat": 31.8
+ }
+]

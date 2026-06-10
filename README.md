@@ -23,7 +23,8 @@ rouge/
 │   ├── ais_ws.py                # (P2) AISStream WebSocket
 │   └── quotes_collector.py      # (P2) data lake Dukascopy M5 existant
 ├── api/
-│   ├── main.py                  # (P1) FastAPI + CORS restreint
+│   ├── main.py                  # FastAPI : front statique + /api/* (enveloppe data/meta)
+│   ├── demo/*.json              # fixtures extraites du front (source de vérité unique)
 │   └── views.sql                # vues DuckDB, une par endpoint
 ├── data/                        # parquet + rouge.duckdb (gitignoré)
 ├── _logs/                       # logs JSON-lines (gitignoré)
@@ -75,8 +76,12 @@ GET /api/intel/pm         → questions, prix, volume, delta
 ## Phases
 
 - **P0** ✅ scaffold, `base.py`, `.env.example`, front déplacé, DuckDB init
-- **P1** API servant les données démo extraites du front, front câblé en
-  `fetch()` avec fallback démo — rendu visuel identique
+- **P1** ✅ API servant les fixtures démo extraites du front
+  (`scripts/extract_demo.py` → `api/demo/*.json`), front servi same-origin
+  sur `http://localhost:8000`, câblé en `loadData()` (timeout 2,5 s) avec
+  fallback démo et badges LIVE/STALE/DÉMO — rendu visuel identique.
+  Dev : `./venv/bin/uvicorn api.main:app --reload` puis ouvrir
+  localhost:8000 (ne pas ouvrir en `file://`).
 - **P2** collecteurs un par un : COT → Polymarket → macro → GDELT →
   quotes/trend → OpenSky → AIS (chacun avec test + vue DuckDB)
 - **P3** APScheduler, systemd (VPS Hetzner), Caddy + Basic Auth, front

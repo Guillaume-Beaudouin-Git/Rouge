@@ -1,0 +1,398 @@
+{
+ "strength": [
+  {
+   "c": "AUD",
+   "iso": "AU",
+   "now": 16.5,
+   "s": [
+    17,
+    14.5,
+    16.7,
+    14.5,
+    14.2,
+    13.4,
+    11.9,
+    14.3,
+    15.8,
+    13.9,
+    15.2,
+    13.7,
+    14.7,
+    16.5
+   ]
+  },
+  {
+   "c": "EUR",
+   "iso": "EU",
+   "now": 10.4,
+   "s": [
+    1.8,
+    1.1,
+    1,
+    2.5,
+    4.3,
+    4.9,
+    6.8,
+    6.5,
+    6.8,
+    6.3,
+    7.8,
+    9.4,
+    10.5,
+    10.4
+   ]
+  },
+  {
+   "c": "CAD",
+   "iso": "CA",
+   "now": 6.9,
+   "s": [
+    6.6,
+    7.4,
+    5.3,
+    3.7,
+    4.3,
+    4.8,
+    7.1,
+    5,
+    7,
+    5.5,
+    7.1,
+    5.5,
+    7.4,
+    6.9
+   ]
+  },
+  {
+   "c": "NZD",
+   "iso": "NZ",
+   "now": 6.1,
+   "s": [
+    5,
+    7.4,
+    6,
+    4.3,
+    4.7,
+    4,
+    2.3,
+    4.2,
+    4.6,
+    4.5,
+    3.7,
+    3.5,
+    5.7,
+    6.1
+   ]
+  },
+  {
+   "c": "GBP",
+   "iso": "GB",
+   "now": 4.3,
+   "s": [
+    4.8,
+    6.1,
+    5.5,
+    2.9,
+    1.8,
+    3,
+    4.2,
+    6.3,
+    7.6,
+    9.2,
+    7.8,
+    8.6,
+    7.1,
+    4.3
+   ]
+  },
+  {
+   "c": "CHF",
+   "iso": "CH",
+   "now": 1.7,
+   "s": [
+    -2,
+    -1.1,
+    0,
+    -0.7,
+    0.6,
+    -1.4,
+    -0.1,
+    1.6,
+    2,
+    -0.7,
+    -1,
+    1,
+    2.4,
+    1.7
+   ]
+  },
+  {
+   "c": "USD",
+   "iso": "US",
+   "now": -1.8,
+   "s": [
+    -3.8,
+    -5.3,
+    -4.8,
+    -5.5,
+    -4.8,
+    -3.8,
+    -1.7,
+    -1.9,
+    -0.3,
+    -1,
+    -0.9,
+    0.6,
+    1.1,
+    -1.8
+   ]
+  },
+  {
+   "c": "JPY",
+   "iso": "JP",
+   "now": -11.9,
+   "s": [
+    -14.9,
+    -12.7,
+    -14.8,
+    -15.4,
+    -15.3,
+    -14.9,
+    -14.9,
+    -14.4,
+    -16,
+    -16.3,
+    -17.2,
+    -15.8,
+    -13.5,
+    -11.9
+   ]
+  }
+ ],
+ "pairs": [
+  {
+   "p": "JPYAUD",
+   "b": "JPY",
+   "q": "AUD",
+   "diff": -28.4,
+   "trend": -1,
+   "conflict": false
+  },
+  {
+   "p": "EURJPY",
+   "b": "EUR",
+   "q": "JPY",
+   "diff": 22.3,
+   "trend": 1,
+   "conflict": false
+  },
+  {
+   "p": "JPYCAD",
+   "b": "JPY",
+   "q": "CAD",
+   "diff": -18.8,
+   "trend": -1,
+   "conflict": false
+  },
+  {
+   "p": "USDAUD",
+   "b": "USD",
+   "q": "AUD",
+   "diff": -18.3,
+   "trend": 1,
+   "conflict": true
+  },
+  {
+   "p": "JPYNZD",
+   "b": "JPY",
+   "q": "NZD",
+   "diff": -18,
+   "trend": -1,
+   "conflict": false
+  },
+  {
+   "p": "JPYGBP",
+   "b": "JPY",
+   "q": "GBP",
+   "diff": -16.2,
+   "trend": 1,
+   "conflict": true
+  },
+  {
+   "p": "CHFAUD",
+   "b": "CHF",
+   "q": "AUD",
+   "diff": -14.8,
+   "trend": 1,
+   "conflict": true
+  },
+  {
+   "p": "JPYCHF",
+   "b": "JPY",
+   "q": "CHF",
+   "diff": -13.6,
+   "trend": -1,
+   "conflict": false
+  },
+  {
+   "p": "USDEUR",
+   "b": "USD",
+   "q": "EUR",
+   "diff": -12.2,
+   "trend": -1,
+   "conflict": false
+  },
+  {
+   "p": "GBPAUD",
+   "b": "GBP",
+   "q": "AUD",
+   "diff": -12.2,
+   "trend": -1,
+   "conflict": false
+  },
+  {
+   "p": "AUDNZD",
+   "b": "AUD",
+   "q": "NZD",
+   "diff": 10.4,
+   "trend": 1,
+   "conflict": false
+  },
+  {
+   "p": "USDJPY",
+   "b": "USD",
+   "q": "JPY",
+   "diff": 10.1,
+   "trend": 1,
+   "conflict": false
+  },
+  {
+   "p": "AUDCAD",
+   "b": "AUD",
+   "q": "CAD",
+   "diff": 9.6,
+   "trend": 1,
+   "conflict": false
+  },
+  {
+   "p": "USDCAD",
+   "b": "USD",
+   "q": "CAD",
+   "diff": -8.7,
+   "trend": -1,
+   "conflict": false
+  },
+  {
+   "p": "EURCHF",
+   "b": "EUR",
+   "q": "CHF",
+   "diff": 8.7,
+   "trend": 1,
+   "conflict": false
+  },
+  {
+   "p": "USDNZD",
+   "b": "USD",
+   "q": "NZD",
+   "diff": -7.9,
+   "trend": -1,
+   "conflict": false
+  },
+  {
+   "p": "USDGBP",
+   "b": "USD",
+   "q": "GBP",
+   "diff": -6.1,
+   "trend": -1,
+   "conflict": false
+  },
+  {
+   "p": "EURGBP",
+   "b": "EUR",
+   "q": "GBP",
+   "diff": 6.1,
+   "trend": 1,
+   "conflict": false
+  },
+  {
+   "p": "EURAUD",
+   "b": "EUR",
+   "q": "AUD",
+   "diff": -6.1,
+   "trend": -1,
+   "conflict": false
+  },
+  {
+   "p": "CHFCAD",
+   "b": "CHF",
+   "q": "CAD",
+   "diff": -5.2,
+   "trend": 1,
+   "conflict": false
+  },
+  {
+   "p": "CHFNZD",
+   "b": "CHF",
+   "q": "NZD",
+   "diff": -4.4,
+   "trend": -1,
+   "conflict": false
+  },
+  {
+   "p": "EURNZD",
+   "b": "EUR",
+   "q": "NZD",
+   "diff": 4.3,
+   "trend": -1,
+   "conflict": false
+  },
+  {
+   "p": "USDCHF",
+   "b": "USD",
+   "q": "CHF",
+   "diff": -3.5,
+   "trend": -1,
+   "conflict": false
+  },
+  {
+   "p": "EURCAD",
+   "b": "EUR",
+   "q": "CAD",
+   "diff": 3.5,
+   "trend": -1,
+   "conflict": false
+  },
+  {
+   "p": "GBPCHF",
+   "b": "GBP",
+   "q": "CHF",
+   "diff": 2.6,
+   "trend": -1,
+   "conflict": false
+  },
+  {
+   "p": "GBPCAD",
+   "b": "GBP",
+   "q": "CAD",
+   "diff": -2.6,
+   "trend": 1,
+   "conflict": false
+  },
+  {
+   "p": "GBPNZD",
+   "b": "GBP",
+   "q": "NZD",
+   "diff": -1.8,
+   "trend": 1,
+   "conflict": false
+  },
+  {
+   "p": "CADNZD",
+   "b": "CAD",
+   "q": "NZD",
+   "diff": 0.8,
+   "trend": -1,
+   "conflict": false
+  }
+ ]
+}

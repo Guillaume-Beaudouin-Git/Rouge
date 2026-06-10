@@ -1,0 +1,130 @@
+[
+ {
+  "name": "EUR FX",
+  "iso": "EU",
+  "pctl": 74,
+  "z": 1.1,
+  "dwk": 12.4,
+  "crowd": false
+ },
+ {
+  "name": "JPY FX",
+  "iso": "JP",
+  "pctl": 8,
+  "z": -1.9,
+  "dwk": -6.2,
+  "crowd": true
+ },
+ {
+  "name": "GBP FX",
+  "iso": "GB",
+  "pctl": 61,
+  "z": 0.4,
+  "dwk": 3.1,
+  "crowd": false
+ },
+ {
+  "name": "AUD FX",
+  "iso": "AU",
+  "pctl": 88,
+  "z": 1.5,
+  "dwk": 9.8,
+  "crowd": false
+ },
+ {
+  "name": "CAD FX",
+  "iso": "CA",
+  "pctl": 12,
+  "z": -1.6,
+  "dwk": -4.4,
+  "crowd": false
+ },
+ {
+  "name": "CHF FX",
+  "iso": "CH",
+  "pctl": 15,
+  "z": -1.4,
+  "dwk": -2.1,
+  "crowd": false
+ },
+ {
+  "name": "MXN FX",
+  "iso": "MX",
+  "pctl": 79,
+  "z": 1.2,
+  "dwk": 5.5,
+  "crowd": false
+ },
+ {
+  "name": "GOLD",
+  "iso": null,
+  "pctl": 58,
+  "z": 0.3,
+  "dwk": 8.7,
+  "crowd": false
+ },
+ {
+  "name": "SILVER",
+  "iso": null,
+  "pctl": 71,
+  "z": 0.9,
+  "dwk": 4.2,
+  "crowd": false
+ },
+ {
+  "name": "COPPER",
+  "iso": null,
+  "pctl": 83,
+  "z": 1.4,
+  "dwk": 6.6,
+  "crowd": false
+ },
+ {
+  "name": "WTI",
+  "iso": null,
+  "pctl": 34,
+  "z": -0.6,
+  "dwk": -11.3,
+  "crowd": false
+ },
+ {
+  "name": "NATGAS",
+  "iso": null,
+  "pctl": 22,
+  "z": -1.1,
+  "dwk": -7.9,
+  "crowd": false
+ },
+ {
+  "name": "E-MINI SPX",
+  "iso": "US",
+  "pctl": 47,
+  "z": -0.1,
+  "dwk": 2,
+  "crowd": false
+ },
+ {
+  "name": "NDX MINI",
+  "iso": "US",
+  "pctl": 22,
+  "z": -1.2,
+  "dwk": 14.6,
+  "crowd": false
+ },
+ {
+  "name": "T-NOTE 10A",
+  "iso": "US",
+  "pctl": 9,
+  "z": -2.1,
+  "dwk": -18.4,
+  "crowd": true
+ },
+ {
+  "name": "VIX FUT",
+  "iso": null,
+  "pctl": 6,
+  "z": -2.3,
+  "dwk": -3,
+  "crowd": true
+ }
+]

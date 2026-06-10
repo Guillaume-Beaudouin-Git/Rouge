@@ -1,0 +1,488 @@
+{
+ "news": [
+  [
+   56.3,
+   26.6,
+   3,
+   "Assurance fret en hausse sur le corridor du Golfe"
+  ],
+  [
+   35.2,
+   31.8,
+   3,
+   "Nouveau round de pourparlers régionaux"
+  ],
+  [
+   30.5,
+   50.4,
+   3,
+   "Frappes de drones signalées dans la nuit"
+  ],
+  [
+   37.6,
+   55.7,
+   2,
+   "Déclarations sur la doctrine énergétique"
+  ],
+  [
+   121.5,
+   25,
+   2,
+   "Exercices navals annoncés dans le détroit"
+  ],
+  [
+   116.4,
+   39.9,
+   2,
+   "Salve d’annonces capex datacenter"
+  ],
+  [
+   -77,
+   38.9,
+   2,
+   "Fenêtre CPI : le consensus se resserre"
+  ],
+  [
+   8.7,
+   50.1,
+   2,
+   "La BCE temporise sur la prochaine baisse"
+  ],
+  [
+   -0.1,
+   51.5,
+   1,
+   "Emploi UK : signal mitigé"
+  ],
+  [
+   139.7,
+   35.7,
+   1,
+   "Le yen sous surveillance verbale"
+  ],
+  [
+   3.4,
+   6.5,
+   1,
+   "Production pétrolière : maintenance prolongée"
+  ],
+  [
+   -58.4,
+   -34.6,
+   1,
+   "Refinancement souverain sous pression"
+  ],
+  [
+   28.9,
+   41,
+   2,
+   "Trafic détroits : cadence record"
+  ],
+  [
+   46.7,
+   24.6,
+   2,
+   "Signal de discipline quotas évoqué"
+  ],
+  [
+   77.2,
+   28.6,
+   1,
+   "Mousson précoce : soft commodities"
+  ]
+ ],
+ "pm": [
+  {
+   "q": "La Fed baisse-t-elle ses taux en septembre ?",
+   "p": 62,
+   "d": 3,
+   "vol": "4.2 M$",
+   "lon": -77,
+   "lat": 38.9
+  },
+  {
+   "q": "Baisse BCE confirmée avant fin juillet ?",
+   "p": 34,
+   "d": -9,
+   "vol": "1.1 M$",
+   "lon": 8.7,
+   "lat": 50.1
+  },
+  {
+   "q": "Transit normal au détroit d’Ormuz fin T2 ?",
+   "p": 71,
+   "d": -4,
+   "vol": "2.7 M$",
+   "lon": 56.3,
+   "lat": 26.6
+  },
+  {
+   "q": "Brent > 95 $ d’ici le 31 août ?",
+   "p": 24,
+   "d": 2,
+   "vol": "1.8 M$",
+   "lon": 51.5,
+   "lat": 25.3
+  },
+  {
+   "q": "Récession US déclarée en 2026 ?",
+   "p": 17,
+   "d": -1,
+   "vol": "3.5 M$",
+   "lon": -74,
+   "lat": 40.7
+  },
+  {
+   "q": "BTC > 150 000 $ au 31 décembre ?",
+   "p": 33,
+   "d": 5,
+   "vol": "6.0 M$",
+   "lon": -122.4,
+   "lat": 37.8
+  },
+  {
+   "q": "Accord commercial UE-US signé avant T4 ?",
+   "p": 41,
+   "d": 0,
+   "vol": "0.9 M$",
+   "lon": 4.4,
+   "lat": 50.8
+  },
+  {
+   "q": "Élargissement du cessez-le-feu régional avant fin juin ?",
+   "p": 46,
+   "d": 6,
+   "vol": "2.2 M$",
+   "lon": 35.2,
+   "lat": 31.8
+  }
+ ],
+ "ais": [
+  {
+   "lon": 86.06882248627953,
+   "lat": 10.377006207816304,
+   "type": "TANKER"
+  },
+  {
+   "lon": 78.94240516378777,
+   "lat": 15.415924560057467,
+   "type": "CARGO"
+  },
+  {
+   "lon": 89.00598697871901,
+   "lat": 10.171949401739987,
+   "type": "TANKER"
+  },
+  {
+   "lon": 85.01066487894859,
+   "lat": 12.26860011333134,
+   "type": "TANKER"
+  },
+  {
+   "lon": 91.06446452183881,
+   "lat": 8.764918288181072,
+   "type": "TANKER"
+  },
+  {
+   "lon": 79.89507527429377,
+   "lat": 12.421219932509121,
+   "type": "CARGO"
+  },
+  {
+   "lon": 34.57313149360149,
+   "lat": 27.62088845563843,
+   "type": "CARGO"
+  },
+  {
+   "lon": 38.02081226797868,
+   "lat": 21.125015708802735,
+   "type": "CARGO"
+  },
+  {
+   "lon": 42.528967267327005,
+   "lat": 16.112995982063936,
+   "type": "TANKER"
+  },
+  {
+   "lon": 41.562048746493645,
+   "lat": 14.408057571514046,
+   "type": "TANKER"
+  },
+  {
+   "lon": 36.99633940562466,
+   "lat": 22.66947580791754,
+   "type": "TANKER"
+  },
+  {
+   "lon": 41.39149500602018,
+   "lat": 16.344262304896027,
+   "type": "CARGO"
+  },
+  {
+   "lon": 114.84514360595495,
+   "lat": 23.496386451497674,
+   "type": "TANKER"
+  },
+  {
+   "lon": 115.011786864046,
+   "lat": 21.448774138451554,
+   "type": "TANKER"
+  },
+  {
+   "lon": 105.32747203237378,
+   "lat": 6.29804718055064,
+   "type": "TANKER"
+  },
+  {
+   "lon": 104.89700406081974,
+   "lat": 3.023588549541312,
+   "type": "TANKER"
+  },
+  {
+   "lon": 116.68747793291695,
+   "lat": 26.50097011537058,
+   "type": "CARGO"
+  },
+  {
+   "lon": 105.95649132370018,
+   "lat": 4.852943869952579,
+   "type": "CARGO"
+  },
+  {
+   "lon": 2.969942544966471,
+   "lat": 49.28940538058174,
+   "type": "TANKER"
+  },
+  {
+   "lon": 3.3114429924893196,
+   "lat": 46.83075211496209,
+   "type": "CARGO"
+  },
+  {
+   "lon": 2.147430958910846,
+   "lat": 47.22363275297219,
+   "type": "CARGO"
+  },
+  {
+   "lon": 3.6043420692626387,
+   "lat": 50.220776660754346,
+   "type": "CARGO"
+  },
+  {
+   "lon": -2.9932981587131504,
+   "lat": 37.38783364797128,
+   "type": "TANKER"
+  },
+  {
+   "lon": -4.206888952781446,
+   "lat": 38.12584760632599,
+   "type": "CARGO"
+  },
+  {
+   "lon": -87.90349795760586,
+   "lat": 21.412320062592627,
+   "type": "CARGO"
+  },
+  {
+   "lon": -85.40930472310633,
+   "lat": 16.348254521898927,
+   "type": "TANKER"
+  },
+  {
+   "lon": -93.76343867988605,
+   "lat": 24.964113494849762,
+   "type": "TANKER"
+  },
+  {
+   "lon": -86.98407374244462,
+   "lat": 19.104079199966975,
+   "type": "TANKER"
+  },
+  {
+   "lon": -87.97001878634327,
+   "lat": 22.76169370295247,
+   "type": "CARGO"
+  },
+  {
+   "lon": -84.73576912773402,
+   "lat": 16.073432647954675,
+   "type": "CARGO"
+  },
+  {
+   "lon": 8.370547660492592,
+   "lat": 34.362330484425186,
+   "type": "TANKER"
+  },
+  {
+   "lon": 1.4301035904663149,
+   "lat": 34.767345597303944,
+   "type": "TANKER"
+  },
+  {
+   "lon": 7.023497147796441,
+   "lat": 33.836121035518595,
+   "type": "TANKER"
+  },
+  {
+   "lon": 16.062070635285927,
+   "lat": 33.927326100564095,
+   "type": "TANKER"
+  },
+  {
+   "lon": 3.2310635856632146,
+   "lat": 34.720015830686314,
+   "type": "CARGO"
+  },
+  {
+   "lon": 16.307869820263008,
+   "lat": 32.72069348284276,
+   "type": "CARGO"
+  }
+ ],
+ "mil": [
+  [
+   24,
+   57.5,
+   "RC-135 · BALTIQUE"
+  ],
+  [
+   33,
+   34.5,
+   "P-8A · MED EST"
+  ],
+  [
+   51,
+   27.5,
+   "KC-135 · GOLFE"
+  ],
+  [
+   123,
+   23,
+   "E-3 · PACIFIQUE O."
+  ],
+  [
+   37,
+   46.5,
+   "RQ-4 · MER NOIRE"
+  ],
+  [
+   -2,
+   49.8,
+   "A330 MRTT · MANCHE"
+  ],
+  [
+   128,
+   36.5,
+   "RC-12 · CORÉE"
+  ],
+  [
+   15,
+   33.5,
+   "AWACS · MED CENTRE"
+  ],
+  [
+   48,
+   15.5,
+   "P-3 · GOLFE ADEN"
+  ],
+  [
+   20,
+   62,
+   "GRIPEN CAP · SCAND."
+  ]
+ ],
+ "choke": [
+  [
+   "ORMUZ",
+   56.25,
+   26.6
+  ],
+  [
+   "MALACCA",
+   101,
+   2.5
+  ],
+  [
+   "SUEZ",
+   32.35,
+   30.45
+  ],
+  [
+   "BAB-EL-MANDEB",
+   43.33,
+   12.58
+  ],
+  [
+   "BOSPHORE",
+   29.06,
+   41.12
+  ],
+  [
+   "GIBRALTAR",
+   -5.6,
+   35.95
+  ],
+  [
+   "PANAMA",
+   -79.68,
+   9.08
+  ],
+  [
+   "DANEMARK",
+   10.9,
+   55.5
+  ],
+  [
+   "BONNE-ESPÉRANCE",
+   18.47,
+   -34.36
+  ],
+  [
+   "TAÏWAN",
+   119.5,
+   24.5
+  ],
+  [
+   "DOUVRES",
+   1.4,
+   51
+  ]
+ ],
+ "zones": [
+  {
+   "name": "GOLFE PERSIQUE",
+   "lon": 52.5,
+   "lat": 26.8,
+   "r": 34,
+   "lvl": "CRITIQUE"
+  },
+  {
+   "name": "MER NOIRE",
+   "lon": 34,
+   "lat": 43.5,
+   "r": 26,
+   "lvl": "ÉLEVÉ"
+  },
+  {
+   "name": "MER ROUGE SUD",
+   "lon": 42.8,
+   "lat": 13.8,
+   "r": 20,
+   "lvl": "ÉLEVÉ"
+  },
+  {
+   "name": "DÉTROIT DE TAÏWAN",
+   "lon": 119.8,
+   "lat": 24.2,
+   "r": 22,
+   "lvl": "ÉLEVÉ"
+  },
+  {
+   "name": "SAHEL CENTRAL",
+   "lon": 1,
+   "lat": 15,
+   "r": 24,
+   "lvl": "MOYEN"
+  }
+ ]
+}

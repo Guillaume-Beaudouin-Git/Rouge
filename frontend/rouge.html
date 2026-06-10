@@ -330,7 +330,7 @@ const X=lon=>(lon+180)/360*1000, Y=lat=>(90-lat)/180*500;
 const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
 
 /* ================= DONNÉES DÉMO (originales) ================= */
-const MKT=[{k:'VIX',v:'17.9',d:+0.8,s:'pt'},{k:'DXY',v:'103.6',d:-0.3,s:'%'},{k:'WTI',v:'79.2',d:+1.1,s:'%'},{k:'GOLD',v:'4 231',d:+0.4,s:'%'},{k:'US 10A',v:'4.18%',d:-2,s:'pb'},{k:'BTC',v:'118 450',d:+1.9,s:'%'}];
+let MKT=[{k:'VIX',v:'17.9',d:+0.8,s:'pt'},{k:'DXY',v:'103.6',d:-0.3,s:'%'},{k:'WTI',v:'79.2',d:+1.1,s:'%'},{k:'GOLD',v:'4 231',d:+0.4,s:'%'},{k:'US 10A',v:'4.18%',d:-2,s:'pb'},{k:'BTC',v:'118 450',d:+1.9,s:'%'}];
 
 const AGENDA=[['12:30 UTC','Fenêtre de publication CPI US'],['14:00 UTC','Décision de banque centrale (G10)'],['18:00 UTC','Minutes de politique monétaire']];
 
@@ -387,7 +387,7 @@ const ASSETS=[
  ['BND','BUND','Bund 10A','DE',null,-4],['BND','TNOTE','T-Note 10A','US',null,2],
  ['CRY','BTC','Bitcoin',null,null,26],['CRY','ETH','Ethereum',null,null,14]
 ];
-const TREND=ASSETS.map(a=>{
+let TREND=ASSETS.map(a=>{
   const [cat,sym,name,f1c,f2c,bias]=a;
   const mom=bias+R(-9,9), mac=bias*0.6+R(-14,14), pos=R(-30,30)+(bias>15?-8:0), risk=bias*0.4+R(-16,16), flow=bias*0.7+R(-10,10);
   const g=0.35*mom+0.20*mac+0.15*pos+0.15*risk+0.15*flow;
@@ -396,7 +396,7 @@ const TREND=ASSETS.map(a=>{
 }).sort((a,b)=>b.g-a.g);
 
 /* —— COT —— */
-const COT=[
+let COT=[
  ['EUR FX','EU',74,1.1,+12.4],['JPY FX','JP',8,-1.9,-6.2],['GBP FX','GB',61,0.4,+3.1],['AUD FX','AU',88,1.5,+9.8],
  ['CAD FX','CA',12,-1.6,-4.4],['CHF FX','CH',15,-1.4,-2.1],['MXN FX','MX',79,1.2,+5.5],
  ['GOLD',null,58,0.3,+8.7],['SILVER',null,71,0.9,+4.2],['COPPER',null,83,1.4,+6.6],
@@ -407,7 +407,7 @@ const COT=[
 /* —— Macro —— */
 const CCYS=[['USD','US'],['EUR','EU'],['GBP','GB'],['JPY','JP'],['AUD','AU'],['CAD','CA'],['CHF','CH'],['CNY','CN']];
 const EVNAMES=[['CPI a/a',3],['CPI sous-jacent a/a',3],['PPI a/a',2],['Taux directeur',3],['NFP / Emploi',3],['Taux de chômage',2],['PMI manufacturier',2],['PIB t/t',3],['Ventes au détail',2],['Balance commerciale',1],['Confiance des ménages',1],['Stocks de brut',2],['Indice ZEW',1],['Climat des affaires Ifo',2],['Permis de construire',1],['Commandes industrielles',1]];
-const MACRO=[];{
+let MACRO=[];{
   const today=new Date(Date.UTC(2026,5,10));
   for(let d=0;d<14;d++){const nEv=2+Math.floor(R(0,4));
     for(let i=0;i<nEv;i++){const c=CCYS[Math.floor(R(0,8))],e=EVNAMES[Math.floor(R(0,EVNAMES.length))];
@@ -417,7 +417,7 @@ const MACRO=[];{
         beatZ:+R(0.1,0.8).toFixed(2),missZ:+(-R(0.1,0.8)).toFixed(2),hit:Math.floor(R(28,62)),n:Math.floor(R(60,360))});}}
   MACRO.sort((a,b)=>a.d-b.d||a.time.localeCompare(b.time));
 }
-const SCORE=CCYS.map(c=>({ccy:c[0],iso:c[1],next:MACRO.filter(m=>m.ccy===c[0]).length,
+let SCORE=CCYS.map(c=>({ccy:c[0],iso:c[1],next:MACRO.filter(m=>m.ccy===c[0]).length,
   beatZ:+R(0.2,0.8).toFixed(2),missZ:+(-R(0.2,0.8)).toFixed(2),beatPct:Math.floor(R(36,58)),n:Math.floor(R(700,1600)),
   mom:+R(-0.3,0.3).toFixed(2),streak:Math.floor(R(-3,4)),
   top:['Stocks de brut','CPI a/a','NFP / Emploi','PIB t/t'][Math.floor(R(0,4))]}));
@@ -426,9 +426,9 @@ const SCORE=CCYS.map(c=>({ccy:c[0],iso:c[1],next:MACRO.filter(m=>m.ccy===c[0]).l
 const G8=['USD','EUR','JPY','GBP','CHF','AUD','CAD','NZD'];
 const FXISO={USD:'US',EUR:'EU',JPY:'JP',GBP:'GB',CHF:'CH',AUD:'AU',CAD:'CA',NZD:'NZ'};
 const FXBIAS={USD:-6,EUR:4,JPY:-12,GBP:3,CHF:-2,AUD:14,CAD:9,NZD:7};
-const FXS=G8.map(c=>{let v=FXBIAS[c]+R(-3,3);const s=[];for(let i=0;i<14;i++){s.push(+v.toFixed(1));v+=R(-2.4,2.4)+(FXBIAS[c]-v)*0.12}
+let FXS=G8.map(c=>{let v=FXBIAS[c]+R(-3,3);const s=[];for(let i=0;i<14;i++){s.push(+v.toFixed(1));v+=R(-2.4,2.4)+(FXBIAS[c]-v)*0.12}
   return {c,iso:FXISO[c],now:s[13],s}}).sort((a,b)=>b.now-a.now);
-const PAIRS=[];G8.forEach((b,i)=>G8.forEach((q,j)=>{if(i<j){const sb=FXS.find(x=>x.c===b).now,sq=FXS.find(x=>x.c===q).now;const diff=+(sb-sq).toFixed(1);
+let PAIRS=[];G8.forEach((b,i)=>G8.forEach((q,j)=>{if(i<j){const sb=FXS.find(x=>x.c===b).now,sq=FXS.find(x=>x.c===q).now;const diff=+(sb-sq).toFixed(1);
   const trend=Math.abs(diff)>4?(diff>0?1:-1)*(rng()>.18?1:-1):(rng()>.5?1:-1);
   PAIRS.push({p:b+q,b,q,diff,trend,conflict:Math.abs(diff)>10&&Math.sign(diff)!==trend})}}));
 PAIRS.sort((a,b)=>Math.abs(b.diff)-Math.abs(a.diff));
@@ -461,7 +461,7 @@ const SEAS_BIAS={SPX:[1.1,.2,.9,1.4,.4,.1,.9,-.3,-1.2,.8,1.7,1.3],NDX:[1.5,.3,.8
 const MONTHS=['JAN','FÉV','MAR','AVR','MAI','JUN','JUL','AOÛ','SEP','OCT','NOV','DÉC'];
 
 /* —— Marchés de prédiction —— */
-const PMARKETS=[
+let PMARKETS=[
  {q:'La Fed baisse-t-elle ses taux en septembre ?',p:62,d:+3,vol:'4.2 M$',lon:-77,lat:38.9},
  {q:'Baisse BCE confirmée avant fin juillet ?',p:34,d:-9,vol:'1.1 M$',lon:8.7,lat:50.1},
  {q:'Transit normal au détroit d\u2019Ormuz fin T2 ?',p:71,d:-4,vol:'2.7 M$',lon:56.3,lat:26.6},
@@ -472,14 +472,14 @@ const PMARKETS=[
  {q:'Élargissement du cessez-le-feu régional avant fin juin ?',p:46,d:+6,vol:'2.2 M$',lon:35.2,lat:31.8}
 ];
 /* —— Données Monitor —— */
-const ZONES=[
+let ZONES=[
  {name:'GOLFE PERSIQUE',lon:52.5,lat:26.8,r:34,lvl:'CRITIQUE'},
  {name:'MER NOIRE',lon:34,lat:43.5,r:26,lvl:'ÉLEVÉ'},
  {name:'MER ROUGE SUD',lon:42.8,lat:13.8,r:20,lvl:'ÉLEVÉ'},
  {name:'DÉTROIT DE TAÏWAN',lon:119.8,lat:24.2,r:22,lvl:'ÉLEVÉ'},
  {name:'SAHEL CENTRAL',lon:1,lat:15,r:24,lvl:'MOYEN'}
 ];
-const NEWSPTS=[
+let NEWSPTS=[
  [56.3,26.6,3,'Assurance fret en hausse sur le corridor du Golfe'],[35.2,31.8,3,'Nouveau round de pourparlers régionaux'],
  [30.5,50.4,3,'Frappes de drones signalées dans la nuit'],[37.6,55.7,2,'Déclarations sur la doctrine énergétique'],
  [121.5,25,2,'Exercices navals annoncés dans le détroit'],[116.4,39.9,2,'Salve d\u2019annonces capex datacenter'],
@@ -493,14 +493,30 @@ const TRADE_ARCS=[
  [[50.2,26.7],[121.5,29.9],3],[[-95.3,29.7],[4.5,51.9],2],[[-46.3,-23.9],[121.8,31.2],2],
  [[118.6,-20.3],[120.4,36.1],2],[[5.3,43.3],[-74,40.7],1]
 ];
-const CHOKE=[['ORMUZ',56.25,26.6],['MALACCA',101.0,2.5],['SUEZ',32.35,30.45],['BAB-EL-MANDEB',43.33,12.58],['BOSPHORE',29.06,41.12],['GIBRALTAR',-5.6,35.95],['PANAMA',-79.68,9.08],['DANEMARK',10.9,55.5],['BONNE-ESPÉRANCE',18.47,-34.36],['TAÏWAN',119.5,24.5],['DOUVRES',1.4,51.0]];
+let CHOKE=[['ORMUZ',56.25,26.6],['MALACCA',101.0,2.5],['SUEZ',32.35,30.45],['BAB-EL-MANDEB',43.33,12.58],['BOSPHORE',29.06,41.12],['GIBRALTAR',-5.6,35.95],['PANAMA',-79.68,9.08],['DANEMARK',10.9,55.5],['BONNE-ESPÉRANCE',18.47,-34.36],['TAÏWAN',119.5,24.5],['DOUVRES',1.4,51.0]];
 const CITIES=[['Tokyo',139.7,35.7,37],['Delhi',77.2,28.6,33],['Shanghai',121.5,31.2,29],['São Paulo',-46.6,-23.5,22],['Mexico',-99.1,19.4,22],['Le Caire',31.2,30.0,22],['Mumbai',72.9,19.1,21],['Pékin',116.4,39.9,21],['Dhaka',90.4,23.8,23],['Osaka',135.5,34.7,19],['New York',-74,40.7,19],['Karachi',67,24.9,17],['Lagos',3.4,6.5,16],['Istanbul',28.9,41,16],['Buenos Aires',-58.4,-34.6,15],['Kinshasa',15.3,-4.3,16],['Manille',121,14.6,14],['Moscou',37.6,55.7,13],['Séoul',127,37.6,10],['Londres',-0.1,51.5,9],['Paris',2.35,48.85,11],['Jakarta',106.8,-6.2,11],['Lima',-77,-12,11],['Bangkok',100.5,13.8,11],['Téhéran',51.4,35.7,9],['Riyad',46.7,24.6,7],['Singapour',103.8,1.3,6],['Sydney',151.2,-33.9,5],['Johannesburg',28,-26.2,6],['Los Angeles',-118.2,34,12],['Chicago',-87.6,41.9,9],['Lahore',74.3,31.5,13],['Bogota',-74.1,4.7,11],['Ho Chi Minh',106.7,10.8,9],['Hong Kong',114.2,22.3,7],['Madrid',-3.7,40.4,6],['Francfort',8.7,50.1,4],['Dubaï',55.3,25.2,4],['Nairobi',36.8,-1.3,5],['Berlin',13.4,52.5,4]];
-const AIS=[];{const lanes=[[[56.3,26.6],[103.8,1.3]],[[32.35,30.45],[43.33,12.58]],[[121.8,31.2],[103.8,1.3]],[[4.5,51.9],[-5.6,35.95]],[[-95.3,29.7],[-79.68,9.08]],[[-5.6,35.95],[32.35,30.45]]];
+let AIS=[];{const lanes=[[[56.3,26.6],[103.8,1.3]],[[32.35,30.45],[43.33,12.58]],[[121.8,31.2],[103.8,1.3]],[[4.5,51.9],[-5.6,35.95]],[[-95.3,29.7],[-79.68,9.08]],[[-5.6,35.95],[32.35,30.45]]];
  lanes.forEach(l=>{for(let i=0;i<6;i++){const t=R(.05,.95);AIS.push({lon:l[0][0]+(l[1][0]-l[0][0])*t+R(-2,2),lat:l[0][1]+(l[1][1]-l[0][1])*t+R(-1.5,1.5),type:rng()>.5?'TANKER':'CARGO'})}})}
-const MILPTS=[[24,57.5,'RC-135 · BALTIQUE'],[33,34.5,'P-8A · MED EST'],[51,27.5,'KC-135 · GOLFE'],[123,23,'E-3 · PACIFIQUE O.'],[37,46.5,'RQ-4 · MER NOIRE'],[-2,49.8,'A330 MRTT · MANCHE'],[128,36.5,'RC-12 · CORÉE'],[15,33.5,'AWACS · MED CENTRE'],[48,15.5,'P-3 · GOLFE ADEN'],[20,62,'GRIPEN CAP · SCAND.']];
+let MILPTS=[[24,57.5,'RC-135 · BALTIQUE'],[33,34.5,'P-8A · MED EST'],[51,27.5,'KC-135 · GOLFE'],[123,23,'E-3 · PACIFIQUE O.'],[37,46.5,'RQ-4 · MER NOIRE'],[-2,49.8,'A330 MRTT · MANCHE'],[128,36.5,'RC-12 · CORÉE'],[15,33.5,'AWACS · MED CENTRE'],[48,15.5,'P-3 · GOLFE ADEN'],[20,62,'GRIPEN CAP · SCAND.']];
 const SEIS_DEMO=[[142.3,38.1,5.6],[-70.6,-33.4,4.8],[27.2,38.4,4.2],[95.9,3.3,5.1],[-155.5,19.4,4.5],[39.7,40.9,4.9],[121,23.7,5.3],[-104,24,4.1],[160,52,5.8],[44.4,33.2,4.0],[-118.5,35.4,3.9],[70.8,36.5,5.0]];
 
 const ECON={US:{n:'États-Unis',pib:2.1,cpi:2.8,tx:4.25,cho:4.1},CN:{n:'Chine',pib:4.6,cpi:0.7,tx:3.0,cho:5.1},JP:{n:'Japon',pib:0.9,cpi:2.3,tx:0.75,cho:2.5},DE:{n:'Allemagne',pib:0.6,cpi:2.2,tx:2.15,cho:6.2},FR:{n:'France',pib:0.9,cpi:1.9,tx:2.15,cho:7.3},GB:{n:'Royaume-Uni',pib:1.1,cpi:3.1,tx:4.0,cho:4.4},IT:{n:'Italie',pib:0.7,cpi:1.6,tx:2.15,cho:6.8},ES:{n:'Espagne',pib:2.0,cpi:2.0,tx:2.15,cho:11.2},CA:{n:'Canada',pib:1.4,cpi:2.4,tx:2.75,cho:6.4},AU:{n:'Australie',pib:1.8,cpi:2.9,tx:3.6,cho:4.0},BR:{n:'Brésil',pib:2.2,cpi:4.6,tx:13.5,cho:7.0},IN:{n:'Inde',pib:6.6,cpi:4.2,tx:5.75,cho:7.8},RU:{n:'Russie',pib:1.3,cpi:7.9,tx:17.0,cho:2.6},KR:{n:'Corée du Sud',pib:1.9,cpi:2.1,tx:2.5,cho:2.8},MX:{n:'Mexique',pib:1.2,cpi:4.1,tx:9.5,cho:2.7},TR:{n:'Turquie',pib:3.1,cpi:34.0,tx:42.5,cho:8.6},SA:{n:'Arabie saoudite',pib:3.8,cpi:1.8,tx:4.75,cho:3.6},ZA:{n:'Afrique du Sud',pib:1.0,cpi:4.4,tx:7.25,cho:32.1},ID:{n:'Indonésie',pib:5.0,cpi:2.4,tx:5.25,cho:4.9},AR:{n:'Argentine',pib:3.5,cpi:42.0,tx:32.0,cho:6.9},EG:{n:'Égypte',pib:4.1,cpi:24.0,tx:26.25,cho:6.7},NG:{n:'Nigeria',pib:3.2,cpi:28.5,tx:26.5,cho:5.0},IR:{n:'Iran',pib:2.4,cpi:36.0,tx:23.0,cho:8.1},UA:{n:'Ukraine',pib:3.0,cpi:9.5,tx:13.0,cho:14.5},PL:{n:'Pologne',pib:3.3,cpi:3.6,tx:5.0,cho:5.0},NL:{n:'Pays-Bas',pib:1.5,cpi:2.6,tx:2.15,cho:3.8},CH:{n:'Suisse',pib:1.2,cpi:0.9,tx:0.25,cho:2.4},SE:{n:'Suède',pib:1.6,cpi:1.8,tx:2.0,cho:8.2}};
+
+/* ================= CÂBLAGE API (P1) ================= */
+/* Chaque module câblé tente l'API same-origin et retombe sur sa constante
+   démo en cas d'échec/timeout. États : demo | live | stale. */
+const DATA_STATE={layers:'demo',cot:'demo',macro:'demo',trend:'demo',fx:'demo',markets:'demo',pm:'demo'};
+function tag(k){const s=DATA_STATE[k];return s==='live'?'<span class="demo-tag live">LIVE</span>':s==='stale'?'<span class="demo-tag">STALE</span>':'<span class="demo-tag">DÉMO</span>'}
+function srcNote(k){const s=DATA_STATE[k];return s==='live'?'':s==='stale'?' (stale)':' (démo)'}
+async function loadData(endpoint,demoConst){
+  try{
+    const ctrl=new AbortController();const tm=setTimeout(()=>ctrl.abort(),2500);
+    const r=await fetch(endpoint,{signal:ctrl.signal});clearTimeout(tm);
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    const j=await r.json();
+    return {data:j.data,status:j.meta&&j.meta.stale?'stale':'live'};
+  }catch(e){return {data:demoConst,status:'demo'}}
+}
 
 /* ================= HORLOGE & ROUTEUR ================= */
 function tick(){const d=new Date();document.getElementById('utc').innerHTML='<b>'+d.toISOString().slice(0,19).replace('T',' ')+'Z</b> · UTC'}
@@ -517,7 +533,7 @@ function route(){
   VIEWS.forEach(x=>document.getElementById('view-'+x).classList.toggle('on',x===v));
   document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',a.dataset.v===v));
   if(v==='intel')renderIntel();
-  if(v==='monitor'&&!monBuilt)buildMonitor();
+  if(v==='monitor'&&!monBuilt)DATA_READY.then(()=>{if(!monBuilt)buildMonitor()});
   if(v!=='home')window.scrollTo(0,0);
 }
 window.addEventListener('hashchange',route);
@@ -557,20 +573,20 @@ function buildMonitor(){
     const core=svgEl('circle',{cx:x,cy:y,r:3,fill:col});
     const halo=svgEl('circle',{cx:x,cy:y,r:z.r,fill:col,opacity:.05});
     const t=svgEl('text',{x:x,y:y-z.r-5,'text-anchor':'middle','font-size':8,fill:col,'letter-spacing':1.5});t.textContent=z.name+' · '+z.lvl;
-    [halo,ring,core,t].forEach(e=>{e.dataset.tip=z.name+' — niveau '+z.lvl+' (démo)';G.zones.appendChild(e)})});
+    [halo,ring,core,t].forEach(e=>{e.dataset.tip=z.name+' — niveau '+z.lvl+srcNote('layers');G.zones.appendChild(e)})});
 
   /* NEWS */
   NEWSPTS.forEach(n=>{const x=X(n[0]),y=Y(n[1]),r=2+n[2]*1.6;
     const c=svgEl('circle',{cx:x,cy:y,r,fill:'none',stroke:'var(--bone)','stroke-width':.8,opacity:.8});
     const d=svgEl('circle',{cx:x,cy:y,r:1.4,fill:'var(--bone)'});
-    c.dataset.tip='NEWS · '+n[3]+' (démo)';d.dataset.tip=c.dataset.tip;
+    c.dataset.tip='NEWS · '+n[3]+srcNote('layers');d.dataset.tip=c.dataset.tip;
     G.news.appendChild(c);G.news.appendChild(d)});
 
   /* PM */
   PMARKETS.forEach(m=>{const x=X(m.lon),y=Y(m.lat);
     const sq=svgEl('rect',{x:x-4,y:y-4,width:8,height:8,fill:'none',stroke:'var(--rouge)','stroke-width':1,transform:`rotate(45 ${x} ${y})`});
     const t=svgEl('text',{x:x+8,y:y+3,'font-size':8,fill:'var(--rouge)'});t.textContent=m.p+'%';
-    sq.dataset.tip='PM · '+m.q+' — '+m.p+' % ('+sgn(m.d)+m.d+' pp / 24h, démo)';t.dataset.tip=sq.dataset.tip;
+    sq.dataset.tip='PM · '+m.q+' — '+m.p+' % ('+sgn(m.d)+m.d+' pp / 24h'+(DATA_STATE.pm==='live'?'':DATA_STATE.pm==='stale'?', stale':', démo')+')';t.dataset.tip=sq.dataset.tip;
     G.pm.appendChild(sq);G.pm.appendChild(t)});
 
   /* TRADE arcs */
@@ -582,12 +598,12 @@ function buildMonitor(){
 
   /* AIS */
   AIS.forEach(s=>{const e=svgEl('rect',{x:X(s.lon)-1.4,y:Y(s.lat)-1.4,width:2.8,height:2.8,fill:s.type==='TANKER'?'var(--rouge-hi)':'var(--steel)',opacity:.9});
-    e.dataset.tip='AIS · '+s.type+' (démo)';G.ais.appendChild(e)});
+    e.dataset.tip='AIS · '+s.type+srcNote('layers');G.ais.appendChild(e)});
 
   /* MIL */
   MILPTS.forEach(m=>{const x=X(m[0]),y=Y(m[1]);
     const tri=svgEl('path',{d:`M${x} ${y-4} L${x+3.4} ${y+2.6} L${x-3.4} ${y+2.6} Z`,fill:'none',stroke:'var(--bone)','stroke-width':1,class:'blink'});
-    tri.dataset.tip='MIL · '+m[2]+' (démo)';G.mil.appendChild(tri)});
+    tri.dataset.tip='MIL · '+m[2]+srcNote('layers');G.mil.appendChild(tri)});
 
   /* POP */
   CITIES.forEach(c=>{const e=svgEl('circle',{cx:X(c[1]),cy:Y(c[2]),r:Math.sqrt(c[3])*0.65,fill:'var(--bone)',opacity:.18});
@@ -621,7 +637,7 @@ function buildMonitor(){
   function paintRail(){
     rail.querySelectorAll('.layer-btn').forEach(b=>b.remove());
     LAYERS.forEach(l=>{const b=document.createElement('button');b.type='button';b.className='layer-btn';b.setAttribute('aria-pressed',l.on);
-      b.innerHTML=`<span class="sw"></span>${l.lbl}${l.live?' <span class="demo-tag live">LIVE</span>':''}<span class="n">${l.n}</span>`;
+      b.innerHTML=`<span class="sw"></span>${l.lbl}${l.live||l.src==='live'?' <span class="demo-tag live">LIVE</span>':l.src==='stale'?' <span class="demo-tag">STALE</span>':''}<span class="n">${l.n}</span>`;
       b.onclick=()=>{l.on=!l.on;G[l.id].setAttribute('display',l.on?'':'none');paintRail();status()};
       rail.appendChild(b)})}
   paintRail();
@@ -664,7 +680,7 @@ function spark(s){const min=Math.min(...s),max=Math.max(...s),w=70,h=18;
   const pts=s.map((v,i)=>`${(i/(s.length-1)*w).toFixed(1)},${(h-2-(v-min)/(max-min||1)*(h-4)).toFixed(1)}`).join(' ');
   return `<svg class="spark" width="${w}" height="${h}"><polyline points="${pts}" fill="none" stroke="${s[s.length-1]>=s[0]?'var(--bone)':'var(--rouge)'}" stroke-width="1.2"/></svg>`}
 
-function mktStrip(){return `<div class="mkt-strip" style="margin-bottom:16px">${MKT.map(m=>`<div class="m"><div class="k">${m.k}</div><span class="v">${m.v}</span><span class="d ${cls(m.d)}">${sgn(m.d)}${m.d}${m.s==='%'?'%':' '+m.s}</span></div>`).join('')}</div>`}
+function mktStrip(){return `<div class="mkt-strip" style="margin-bottom:16px">${MKT.map(m=>`<div class="m"><div class="k">${m.k}</div><span class="v">${m.v}</span><span class="d ${cls(m.d)}">${sgn(m.d)}${m.d}${m.s==='%'?'%':' '+m.s}</span></div>`).join('')}<div class="m" style="flex:0 0 auto"><div class="k">FLUX</div><div style="margin-top:5px">${tag('markets')}</div></div></div>`}
 
 function rBrief(){return title('Brief','La note du matin : les arcs qui comptent, chaque événement adossé à une métrique de marché. Rédigé par le desk, daté, archivé.','/INTEL/BRIEF · <span class="demo-tag">DÉMO</span>')+
   `<div class="lbl" style="margin-bottom:6px">${BRIEF.date} — ${BRIEF.stats} · ${BRIEF.tier}</div>
@@ -716,7 +732,7 @@ function rTrend(){
   const avg=a=>a.reduce((x,y)=>x+y,0)/a.length;
   const regime=avg(ron)-avg(roff)>8?'RISK-ON':avg(roff)-avg(ron)>8?'RISK-OFF':'ÉQUILIBRÉ';
   const cats={};TREND.forEach(t=>{(cats[t.cat]=cats[t.cat]||[]).push(t.g)});
-  return title('Trend matrix','Toutes les classes d\u2019actifs sur un écran : score global pondéré (momentum 35 %, macro 20 %, positionnement / risque / flux 15 % chacun), verdict, percentile 30 jours.','/INTEL/TREND · 26 ACTIFS · <span class="demo-tag">DÉMO</span>')+
+  return title('Trend matrix','Toutes les classes d\u2019actifs sur un écran : score global pondéré (momentum 35 %, macro 20 %, positionnement / risque / flux 15 % chacun), verdict, percentile 30 jours.','/INTEL/TREND · '+TREND.length+' ACTIFS · '+tag('trend'))+
   `<div class="regime"><div class="r"><div class="lbl">RÉGIME</div><div class="big" style="color:${regime==='RISK-ON'?'var(--bone)':regime==='RISK-OFF'?'var(--rouge)':'var(--steel)'}">${regime}</div></div>
    ${Object.entries(cats).map(([c,v])=>`<div class="r"><div class="lbl">${c}</div><div style="font-size:16px;font-weight:600" class="${cls(avg(v))}">${f1(avg(v))}</div><div style="font-size:9px;color:var(--bone-faint)">${v.filter(x=>x>18).length}↑ ${v.filter(x=>x<-18).length}↓ / ${v.length}</div></div>`).join('')}</div>
   <div class="tblwrap"><table><thead><tr><th>ACTIF</th><th>GLOBAL</th><th></th><th>VERDICT</th><th>PCTL 30J</th><th>Δ JOUR</th><th>MOMENTUM</th><th>MACRO</th><th>POSITION</th><th>RISQUE</th><th>FLUX</th></tr></thead><tbody>
@@ -728,7 +744,7 @@ function rTrend(){
   </tbody></table></div>`}
 
 function rCot(){const crowded=COT.filter(c=>c.crowd).length;
-  return title('COT','Positionnement spéculatif CFTC : percentile 3 ans du net spéculateurs, z-score, variation hebdomadaire. Les extrêmes (P≥90 / P≤10) signalent la saturation — le carburant des retournements.','/INTEL/COT · CFTC HEBDO · <span class="demo-tag">DÉMO</span>')+
+  return title('COT','Positionnement spéculatif CFTC : percentile 3 ans du net spéculateurs, z-score, variation hebdomadaire. Les extrêmes (P≥90 / P≤10) signalent la saturation — le carburant des retournements.','/INTEL/COT · CFTC HEBDO · '+tag('cot'))+
   `<div class="regime"><div class="r"><div class="lbl">MARCHÉS SATURÉS</div><div class="big" style="color:var(--rouge)">${crowded}<span style="font-size:14px;color:var(--bone-faint)"> / ${COT.length}</span></div></div>
    <div class="r"><div class="lbl">LECTURE</div><div style="font-family:var(--sans);font-size:12px;color:var(--bone-dim);max-width:420px">Un percentile extrême n\u2019est pas un signal de timing : c\u2019est une mesure d\u2019asymétrie. Croisez avec la Trend matrix avant d\u2019agir.</div></div></div>
   <div class="tblwrap"><table><thead><tr><th>CONTRAT</th><th>NET SPEC · PCTL 3A</th><th></th><th>Z-SCORE</th><th>Δ SEMAINE (k)</th><th>ÉTAT</th></tr></thead><tbody>
@@ -742,7 +758,7 @@ function rMacro(){
   const days=Object.keys(byDay).map(Number).sort((a,b)=>a-b);
   const fmtD=dt=>dt.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short',timeZone:'UTC'}).toUpperCase();
   const peak=days.reduce((p,d)=>byDay[d].length>byDay[p].length?d:p,days[0]);
-  return title('Macro','Le calendrier des 14 prochains jours, chaque publication notée contre son propre historique : z-score moyen des beats / miss, taux de surprise positive, profondeur d\u2019échantillon.','/INTEL/MACRO · '+MACRO.length+' ÉVÉNEMENTS · <span class="demo-tag">DÉMO</span>')+
+  return title('Macro','Le calendrier des 14 prochains jours, chaque publication notée contre son propre historique : z-score moyen des beats / miss, taux de surprise positive, profondeur d\u2019échantillon.','/INTEL/MACRO · '+MACRO.length+' ÉVÉNEMENTS · '+tag('macro'))+
   `<div class="lbl" style="margin-bottom:8px">FENÊTRE D'IMPACT · 14 J</div>
    <div style="display:flex;gap:3px;align-items:flex-end;height:74px;margin-bottom:22px">
    ${days.map(d=>{const n=byDay[d].length,h=10+n*9;return `<div style="flex:1;text-align:center"><div style="height:${h}px;background:${d===peak?'var(--rouge)':'var(--ink3)'};border:1px solid var(--line2)"></div><div style="font-size:8px;color:var(--bone-faint);margin-top:3px">${fmtD(byDay[d][0].dt)}<br>${n}</div></div>`}).join('')}</div>
@@ -765,7 +781,7 @@ function rMacro(){
    </tbody></table></div>`}
 
 function rFx(){
-  return title('FX','Force relative des 8 majeures — panier croisé pondéré en inverse de la volatilité, historique 14 jours — puis décomposition des 28 paires : différentiel, alignement de tendance, drapeaux de conflit.','/INTEL/FX · G8 · <span class="demo-tag">DÉMO</span>')+
+  return title('FX','Force relative des 8 majeures — panier croisé pondéré en inverse de la volatilité, historique 14 jours — puis décomposition des 28 paires : différentiel, alignement de tendance, drapeaux de conflit.','/INTEL/FX · G8 · '+tag('fx'))+
   `<div class="grid2" style="margin-bottom:18px"><div class="panel"><div class="lbl" style="margin-bottom:10px">CLASSEMENT — SCORE DE FORCE</div>
    ${FXS.map((c,i)=>`<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--line)">
      <span style="width:18px;color:var(--bone-faint)">${i+1}</span><span class="flag">${flag(c.iso)}</span><b style="width:42px">${c.c}</b>
@@ -810,7 +826,7 @@ function rSeason(){
    ${SEAS_ASSETS.map(a=>`<div class="rowlbl">${a}</div>${SEAS_BIAS[a].map((v,i)=>`<div class="cell" style="background:${heat(v)};${i===cur?'outline:1px solid var(--rouge)':''};color:${Math.abs(v)>=1?'var(--bone)':'var(--bone-faint)'}" title="${a} · ${MONTHS[i]} : ${f1(v)} % en moyenne">${v.toFixed(1)}</div>`).join('')}`).join('')}</div>
    <div style="margin-top:10px;font-size:9px;color:var(--bone-faint)">COLONNE ENCADRÉE = MOIS EN COURS · VALEURS EN % MOYEN MENSUEL</div></div>`}
 
-function rMarkets(){return title('Prédiction','Les questions qui comptent, au prix du marché : probabilités en direct, variation 24 h, profondeur. Quand le livre reprice plus vite que les dépêches, c\u2019est ici que ça se voit d\u2019abord.','/INTEL/PRÉDICTION · 8 LIVRES · <span class="demo-tag">DÉMO</span>')+
+function rMarkets(){return title('Prédiction','Les questions qui comptent, au prix du marché : probabilités en direct, variation 24 h, profondeur. Quand le livre reprice plus vite que les dépêches, c\u2019est ici que ça se voit d\u2019abord.','/INTEL/PRÉDICTION · '+PMARKETS.length+' LIVRES · '+tag('pm'))+
   `<div class="mods">${PMARKETS.map(m=>`<div class="mod"><p style="font-family:var(--sans);font-size:13px;color:var(--bone);min-height:38px">${m.q}</p>
    <div style="display:flex;align-items:baseline;gap:10px;margin-top:10px"><span style="font-family:var(--disp);font-weight:800;font-size:34px">${m.p}<span style="font-size:16px">%</span></span>
    <span class="${cls(m.d)}" style="font-size:12px">${m.d?sgn(m.d)+m.d+' pp / 24h':'stable'}</span></div>
@@ -869,6 +885,30 @@ function renderDocs(){
   <p>Une seule couleur porte le signal : <b style="color:var(--rouge)">le rouge</b> marque ce qui baisse, sature ou diverge ; l'os marque ce qui monte ; l'acier, le neutre. Les pastilles <span class="demo-tag">DÉMO</span> et <span class="demo-tag live">LIVE</span> indiquent la nature de chaque flux. Tout score est borné et daté ; aucun chiffre sans fenêtre.</p>`}
 
 /* ================= INIT ================= */
+const DATA_READY=(async()=>{
+  const [layers,cot,macro,trend,fx,markets,pm]=await Promise.all([
+    loadData('/api/monitor/layers',{news:NEWSPTS,pm:PMARKETS,ais:AIS,mil:MILPTS,choke:CHOKE,zones:ZONES}),
+    loadData('/api/intel/cot',COT),
+    loadData('/api/intel/macro',{events:MACRO,scores:SCORE}),
+    loadData('/api/intel/trend',TREND),
+    loadData('/api/intel/fx',{strength:FXS,pairs:PAIRS}),
+    loadData('/api/intel/markets',MKT),
+    loadData('/api/intel/pm',PMARKETS)
+  ]);
+  ZONES=layers.data.zones;NEWSPTS=layers.data.news;AIS=layers.data.ais;MILPTS=layers.data.mil;CHOKE=layers.data.choke;
+  DATA_STATE.layers=layers.status;
+  COT=cot.data;DATA_STATE.cot=cot.status;
+  MACRO=macro.data.events.map(m=>({...m,dt:new Date(m.dt)}));SCORE=macro.data.scores;DATA_STATE.macro=macro.status;
+  TREND=trend.data;DATA_STATE.trend=trend.status;
+  FXS=fx.data.strength;PAIRS=fx.data.pairs;DATA_STATE.fx=fx.status;
+  MKT=markets.data;DATA_STATE.markets=markets.status;
+  PMARKETS=pm.data;DATA_STATE.pm=pm.status;
+  /* rail monitor : compteurs + source par calque (pm suit l'endpoint intel/pm) */
+  [['zones',ZONES,'layers'],['news',NEWSPTS,'layers'],['ais',AIS,'layers'],['mil',MILPTS,'layers'],['ref',CHOKE,'layers'],['pm',PMARKETS,'pm']]
+    .forEach(([id,arr,k])=>{const l=LAYERS.find(x=>x.id===id);l.n=arr.length;l.src=DATA_STATE[k]});
+  renderHome();
+  if(document.getElementById('view-intel').classList.contains('on'))renderIntel();
+})();
 renderHome();renderDocs();route();
 </script>
 </body>

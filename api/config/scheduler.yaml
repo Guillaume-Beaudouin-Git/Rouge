@@ -1,0 +1,28 @@
+# Cadences du scheduler P3 (collectors/scheduler.py, APScheduler, tz UTC).
+# AIS n'est PAS ici : daemon streaming séparé (service rouge-ais).
+
+jobs:
+  pm:        {every_minutes: 5}
+  news:      {every_minutes: 15}
+  flights:   {every_minutes: 10}     # budget OpenSky : 14 % du quota/jour
+  macro:     {every_hours: 6}        # ⊇ 1 pull/jour + re-pull J+1
+  cot:       {cron: "30 21 * * fri"} # publication CFTC vendredi ~20:30 UTC
+  cot_retry: {cron: "30 12 * * sat"} # filet si publication tardive (idempotent)
+  # chaîne quotes : le cache M5 arrive du Mac par rsync (~03:45 UTC,
+  # post-refresh Dukascopy 05:02 Paris) → agrégation daily puis rebuild
+  # des modules dérivés
+  quotes_chain: {cron: "15 4 * * tue-sat"}
+  retention:    {cron: "10 3 * * *"}
+  stale_check:  {every_minutes: 60}
+
+# datasets critiques surveillés par stale_check : âge max du dernier
+# fichier écrit (liveness pipeline — la staleness sémantique est gérée
+# par les endpoints). Alerte Telegram si dépassé (sinon log ERROR).
+stale_limits_s:
+  pm:           1800        # 5 min de cadence → 30 min de grâce
+  news_raw:     3600
+  mil:          1800
+  ais:          1800
+  macro_events: 129600      # 36 h
+  quotes_daily: 345600      # 4 j (week-end + jours fériés)
+  cot:          950400      # 11 j (rapport hebdo)

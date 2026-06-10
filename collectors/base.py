@@ -53,7 +53,10 @@ def get_logger(name: str) -> logging.Logger:
         return logger
     logger.setLevel(logging.INFO)
     LOG_DIR.mkdir(parents=True, exist_ok=True)
-    fh = logging.FileHandler(LOG_DIR / f"{name}.log", encoding="utf-8")
+    # rotation : 10 Mo × 3 — pas de logs sans borne en prod
+    from logging.handlers import RotatingFileHandler
+    fh = RotatingFileHandler(LOG_DIR / f"{name}.log", encoding="utf-8",
+                             maxBytes=10_000_000, backupCount=3)
     fh.setFormatter(_JsonFormatter())
     sh = logging.StreamHandler()
     sh.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(name)s %(message)s"))

@@ -1,0 +1,20 @@
+# ROUGE — reverse proxy + Basic Auth obligatoire.
+# Choix documenté : pas de sous-domaine disponible → HTTP sur :80 avec
+# allowlist ufw en complément (cf. docs/deploy.md). Si un sous-domaine
+# arrive, remplacer ":80" par "rouge.example.com" : Caddy gère le TLS seul.
+# Le hash bcrypt N'EST PAS dans le repo : /etc/caddy/rouge_users (généré
+# par `caddy hash-password`, lisible par caddy uniquement).
+
+:80 {
+	basic_auth {
+		import /etc/caddy/rouge_users
+	}
+	reverse_proxy 127.0.0.1:8000
+	encode gzip
+	log {
+		output file /var/log/caddy/rouge_access.log {
+			roll_size 20mb
+			roll_keep 5
+		}
+	}
+}

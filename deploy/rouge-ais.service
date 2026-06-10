@@ -1,0 +1,18 @@
+[Unit]
+Description=ROUGE daemon AIS (AISStream WebSocket)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=rouge
+Group=rouge
+WorkingDirectory=/home/rouge/rouge
+EnvironmentFile=/home/rouge/rouge/.env
+ExecStart=/home/rouge/rouge/venv/bin/python -m collectors.ais_ws
+Restart=on-failure
+RestartSec=15
+StandardOutput=append:/home/rouge/rouge/_logs/ais.service.log
+StandardError=append:/home/rouge/rouge/_logs/ais.service.log
+
+[Install]
+WantedBy=multi-user.target

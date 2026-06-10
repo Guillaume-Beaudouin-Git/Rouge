@@ -1,0 +1,19 @@
+[Unit]
+Description=ROUGE API (FastAPI/uvicorn)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=rouge
+Group=rouge
+WorkingDirectory=/home/rouge/rouge
+EnvironmentFile=/home/rouge/rouge/.env
+Environment=ROUGE_ENV=prod
+ExecStart=/home/rouge/rouge/venv/bin/uvicorn api.main:app --host 127.0.0.1 --port 8000
+Restart=on-failure
+RestartSec=5
+StandardOutput=append:/home/rouge/rouge/_logs/api.service.log
+StandardError=append:/home/rouge/rouge/_logs/api.service.log
+
+[Install]
+WantedBy=multi-user.target

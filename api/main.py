@@ -57,9 +57,38 @@ def envelope(dataset: str) -> dict:
     }
 
 
+#: âge max par dataset (liveness pipeline) — aligné sur scheduler.yaml
+#: pour les critiques, + les dérivés quotidiens
+HEALTH_LIMITS_S = {
+    "pm": 1800, "news_raw": 3600, "news_sel": 3600, "mil": 1800, "ais": 1800,
+    "macro_events": 129_600, "quotes_daily": 345_600, "cot": 950_400,
+    "trend": 345_600, "fx_strength": 345_600, "season": 950_400,
+    "tdi": 345_600, "micro_hours": 345_600,
+}
+
+
 @app.get("/api/health")
 def health() -> dict:
-    return {"status": "ok", "env": ROUGE_ENV}
+    """Santé par dataset : horodatage du dernier fichier écrit, âge, stale."""
+    import time as _time
+    now = _time.time()
+    out = {}
+    for ds, limit in HEALTH_LIMITS_S.items():
+        root = REPO_ROOT / "data" / ds
+        files = list(root.rglob("*.parquet")) if root.exists() else []
+        if not files:
+            out[ds] = {"asof": None, "age_s": None, "stale": True}
+            continue
+        mtime = max(p.stat().st_mtime for p in files)
+        age = int(now - mtime)
+        out[ds] = {
+            "asof": datetime.fromtimestamp(mtime, timezone.utc).isoformat(timespec="seconds"),
+            "age_s": age,
+            "stale": age > limit,
+        }
+    degraded = [ds for ds, v in out.items() if v["stale"]]
+    return {"status": "degraded" if degraded else "ok", "env": ROUGE_ENV,
+            "degraded": degraded, "datasets": out}
 
 
 NEWS_STALE_MINUTES = 60  # cf. news_map.yaml stale_after_minutes

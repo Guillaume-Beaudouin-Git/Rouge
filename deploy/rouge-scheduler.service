@@ -1,0 +1,18 @@
+[Unit]
+Description=ROUGE scheduler (APScheduler — collecteurs + retention + stale check)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=rouge
+Group=rouge
+WorkingDirectory=/home/rouge/rouge
+EnvironmentFile=/home/rouge/rouge/.env
+ExecStart=/home/rouge/rouge/venv/bin/python -m collectors.scheduler
+Restart=on-failure
+RestartSec=10
+StandardOutput=append:/home/rouge/rouge/_logs/scheduler.service.log
+StandardError=append:/home/rouge/rouge/_logs/scheduler.service.log
+
+[Install]
+WantedBy=multi-user.target

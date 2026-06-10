@@ -113,3 +113,22 @@ def test_logs_are_json_lines(collector: DummyCollector) -> None:
     for line in log_file.read_text(encoding="utf-8").splitlines():
         rec = json.loads(line)
         assert {"ts", "level", "msg"} <= rec.keys()
+
+
+def test_retention_compacte_les_jours_passes(tmp_path, monkeypatch):
+    import scripts.retention as ret
+    monkeypatch.setattr(ret, "REPO_ROOT", tmp_path)
+    from datetime import date
+    d = tmp_path / "data" / "pm" / "date=2026-06-09"
+    d.mkdir(parents=True)
+    for h in ("080000", "080500", "081000"):
+        pd.DataFrame({"x": [1]}).to_parquet(d / f"part-{h}.parquet")
+    today_dir = tmp_path / "data" / "pm" / "date=2026-06-10"
+    today_dir.mkdir()
+    pd.DataFrame({"x": [1]}).to_parquet(today_dir / "part-090000.parquet")
+    stats = ret.run_retention(today=date(2026, 6, 10))
+    assert stats["pm"] == 3
+    assert [p.name for p in sorted(d.glob("*.parquet"))] == ["part.parquet"]
+    assert len(pd.read_parquet(d / "part.parquet")) == 3
+    # le jour courant n'est jamais touché
+    assert (today_dir / "part-090000.parquet").exists()

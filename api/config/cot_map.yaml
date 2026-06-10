@@ -1,0 +1,32 @@
+# Mapping COT : symbole front → dataset Socrata CFTC + contrat.
+# Vérifié le 2026-06-10 contre publicreporting.cftc.gov (rapport du 2026-06-02).
+# Positionnement net spéculatif = Managed Money (disaggregated) /
+# Leveraged Funds (tff). L'ordre des contrats = ordre d'affichage du front.
+
+datasets:
+  disaggregated:
+    id: 72hh-3qpy            # Disaggregated Futures Only
+    long_col: m_money_positions_long_all
+    short_col: m_money_positions_short_all
+  tff:
+    id: gpe5-46if            # Traders in Financial Futures, Futures Only
+    long_col: lev_money_positions_long
+    short_col: lev_money_positions_short
+
+contracts:
+  - {sym: EUR FX,     iso: EU,   dataset: tff,            code: "099741", market: EURO FX,           category: fx}
+  - {sym: JPY FX,     iso: JP,   dataset: tff,            code: "097741", market: JAPANESE YEN,      category: fx}
+  - {sym: GBP FX,     iso: GB,   dataset: tff,            code: "096742", market: BRITISH POUND,     category: fx}
+  - {sym: AUD FX,     iso: AU,   dataset: tff,            code: "232741", market: AUSTRALIAN DOLLAR, category: fx}
+  - {sym: CAD FX,     iso: CA,   dataset: tff,            code: "090741", market: CANADIAN DOLLAR,   category: fx}
+  - {sym: CHF FX,     iso: CH,   dataset: tff,            code: "092741", market: SWISS FRANC,       category: fx}
+  - {sym: MXN FX,     iso: MX,   dataset: tff,            code: "095741", market: MEXICAN PESO,      category: fx}
+  - {sym: GOLD,       iso: null, dataset: disaggregated,  code: "088691", market: GOLD,              category: metals}
+  - {sym: SILVER,     iso: null, dataset: disaggregated,  code: "084691", market: SILVER,            category: metals}
+  - {sym: COPPER,     iso: null, dataset: disaggregated,  code: "085692", market: "COPPER- #1",      category: metals}
+  - {sym: WTI,        iso: null, dataset: disaggregated,  code: "067651", market: WTI-PHYSICAL,      category: energy}
+  - {sym: NATGAS,     iso: null, dataset: disaggregated,  code: "023651", market: NAT GAS NYME,      category: energy}
+  - {sym: E-MINI SPX, iso: US,   dataset: tff,            code: "13874A", market: E-MINI S&P 500,    category: equity}
+  - {sym: NDX MINI,   iso: US,   dataset: tff,            code: "209742", market: NASDAQ MINI,       category: equity}
+  - {sym: T-NOTE 10A, iso: US,   dataset: tff,            code: "043602", market: UST 10Y NOTE,      category: rates}
+  - {sym: VIX FUT,    iso: null, dataset: tff,            code: "1170E1", market: VIX FUTURES,       category: vol}

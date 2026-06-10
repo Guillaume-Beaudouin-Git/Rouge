@@ -22,6 +22,8 @@ def main() -> int:
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     con = duckdb.connect(str(DB_PATH))
     sql = VIEWS_SQL.read_text(encoding="utf-8")
+    # même réécriture qu'api/db.py : chemins du repo → absolus
+    sql = sql.replace("'data/", f"'{REPO_ROOT}/data/")
     statements = [s.strip() for s in sql.split(";") if s.strip() and not all(
         line.strip().startswith("--") or not line.strip() for line in s.splitlines()
     )]

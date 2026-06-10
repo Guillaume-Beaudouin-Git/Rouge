@@ -11,8 +11,9 @@ Dev : ./venv/bin/uvicorn api.main:app --reload  puis  http://localhost:8000
 from __future__ import annotations
 
 import json
+import logging
 import os
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -20,6 +21,10 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+
+from api import db
+
+log = logging.getLogger("rouge.api")
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 load_dotenv(REPO_ROOT / ".env")
@@ -62,9 +67,38 @@ def monitor_layers() -> dict:
     return envelope("layers")
 
 
+#: seuil de péremption par dataset (jours depuis la date de référence)
+COT_STALE_DAYS = 10
+
+
 @app.get("/api/intel/cot")
 def intel_cot() -> dict:
-    return envelope("cot")
+    """COT réel via v_cot (asof = date du rapport, le mardi de référence) ;
+    repli silencieux sur la fixture démo si le data lake est indisponible."""
+    try:
+        rows = db.query(
+            "SELECT name, iso, pctl, z, dwk, crowd, report_date FROM v_cot ORDER BY ord"
+        )
+        expected = len(json.loads((DEMO_DIR / "cot.json").read_text(encoding="utf-8")))
+        if len(rows) != expected:
+            raise LookupError(f"v_cot : {len(rows)} contrats au lieu de {expected}")
+        asof = max(r["report_date"] for r in rows)
+        data = [
+            {"name": r["name"], "iso": r["iso"], "pctl": r["pctl"],
+             "z": r["z"], "dwk": r["dwk"], "crowd": r["crowd"]}
+            for r in rows
+        ]
+        return {
+            "data": data,
+            "meta": {
+                "source": "cftc-socrata",
+                "asof": asof.isoformat(),
+                "stale": (date.today() - asof).days > COT_STALE_DAYS,
+            },
+        }
+    except Exception as err:
+        log.warning("v_cot indisponible (%s) — repli fixture démo", err)
+        return envelope("cot")
 
 
 @app.get("/api/intel/macro")

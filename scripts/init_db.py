@@ -1,9 +1,8 @@
 """Initialise data/rouge.duckdb et (ré)applique api/views.sql.
 
-Idempotent : exécutable à tout moment, notamment après chaque ajout
-de collecteur en P2. Les vues sur des datasets encore absents sont
-simplement ignorées (commentées dans views.sql tant que le parquet
-n'existe pas).
+Idempotent : exécutable à tout moment, notamment après chaque ajout de
+collecteur en P2. Les vues sur des datasets non encore collectés sont
+ignorées (DuckDB valide les globs parquet à la création de la vue).
 """
 
 from __future__ import annotations
@@ -14,25 +13,25 @@ from pathlib import Path
 import duckdb
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(REPO_ROOT))
+
+from api.db import apply_views  # noqa: E402
+
 DB_PATH = REPO_ROOT / "data" / "rouge.duckdb"
-VIEWS_SQL = REPO_ROOT / "api" / "views.sql"
 
 
 def main() -> int:
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     con = duckdb.connect(str(DB_PATH))
-    sql = VIEWS_SQL.read_text(encoding="utf-8")
-    # même réécriture qu'api/db.py : chemins du repo → absolus
-    sql = sql.replace("'data/", f"'{REPO_ROOT}/data/")
-    statements = [s.strip() for s in sql.split(";") if s.strip() and not all(
-        line.strip().startswith("--") or not line.strip() for line in s.splitlines()
-    )]
-    for stmt in statements:
-        con.execute(stmt)
-    tables = con.execute("SELECT view_name FROM duckdb_views() WHERE NOT internal").fetchall()
+    skipped = apply_views(con, REPO_ROOT)
+    views = [v[0] for v in con.execute(
+        "SELECT view_name FROM duckdb_views() WHERE NOT internal"
+    ).fetchall()]
     con.close()
-    print(f"OK — {DB_PATH.relative_to(REPO_ROOT)} initialisée, {len(tables)} vue(s) : "
-          + (", ".join(t[0] for t in tables) or "aucune (normal en P0)"))
+    print(f"OK — {DB_PATH.relative_to(REPO_ROOT)} : {len(views)} vue(s) : "
+          + (", ".join(views) or "aucune"))
+    if skipped:
+        print(f"ignorées (datasets absents) : {len(skipped)}")
     return 0
 
 

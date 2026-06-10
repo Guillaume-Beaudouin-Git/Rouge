@@ -52,8 +52,23 @@ SELECT a.sym AS name, a.iso, a.report_date, a.net, a.pctl,
 FROM agg a LEFT JOIN prev p ON p.sym = a.sym
 ORDER BY a.ord;
 
+-- ============================================================ PM
+-- Brut : un point de probabilité par marché par collecte (part-HHMMSS).
+CREATE OR REPLACE VIEW v_pm_raw AS
+SELECT category, event_title, event_slug, market_id, market_slug,
+       q, p, p_raw, d, vol_num, vol24h, end_date, display, lon, lat, ord,
+       snapshot_ts
+FROM read_parquet('data/pm/date=*/part-*.parquet');
+
+-- GET /api/intel/pm — forme front : q, p, d, vol, lon, lat.
+-- Dernier snapshot, marchés display uniquement, ordre du mapping.
+CREATE OR REPLACE VIEW v_pm AS
+SELECT q, p, d, vol_num, lon, lat, ord, snapshot_ts
+FROM v_pm_raw
+WHERE display AND snapshot_ts = (SELECT max(snapshot_ts) FROM v_pm_raw)
+ORDER BY ord;
+
 -- ============================================================ à venir (P2)
--- v_pm       → GET /api/intel/pm
 -- v_macro    → GET /api/intel/macro
 -- v_trend    → GET /api/intel/trend
 -- v_fx       → GET /api/intel/fx

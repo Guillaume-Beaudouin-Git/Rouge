@@ -12,6 +12,7 @@ import pandas as pd
 import pytest
 import yaml
 
+from api.db import apply_views
 from collectors.cot_collector import MAP_PATH, load_cot_map, normalize
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -88,12 +89,8 @@ def _build_lake(tmp_path: Path, series: dict[str, list[int]]) -> Path:
 
 
 def _query_v_cot(lake_root: Path) -> list[dict]:
-    sql = (REPO_ROOT / "api" / "views.sql").read_text(encoding="utf-8")
-    sql = sql.replace("'data/", f"'{lake_root}/data/")
     con = duckdb.connect()
-    for stmt in sql.split(";"):
-        if stmt.strip():
-            con.execute(stmt)
+    apply_views(con, lake_root)
     cur = con.execute("SELECT * FROM v_cot ORDER BY ord")
     cols = [d[0] for d in cur.description]
     return [dict(zip(cols, r)) for r in cur.fetchall()]

@@ -121,9 +121,41 @@ def intel_markets() -> dict:
     return envelope("markets")
 
 
+PM_STALE_MINUTES = 30
+
+
+def _fmt_vol(v: float) -> str:
+    return f"{v / 1e6:.1f} M$" if v >= 1e6 else f"{v / 1e3:.0f} k$"
+
+
 @app.get("/api/intel/pm")
 def intel_pm() -> dict:
-    return envelope("pm")
+    """Marchés de prédiction réels via v_pm (asof = timestamp de collecte) ;
+    repli silencieux sur la fixture démo si le data lake est indisponible."""
+    try:
+        rows = db.query("SELECT q, p, d, vol_num, lon, lat, snapshot_ts FROM v_pm ORDER BY ord")
+        expected = len(json.loads((DEMO_DIR / "pm.json").read_text(encoding="utf-8")))
+        if len(rows) != expected:
+            raise LookupError(f"v_pm : {len(rows)} livres au lieu de {expected}")
+        asof = max(r["snapshot_ts"] for r in rows)
+        asof = asof.replace(tzinfo=timezone.utc) if asof.tzinfo is None else asof.astimezone(timezone.utc)
+        age_min = (datetime.now(timezone.utc) - asof).total_seconds() / 60
+        data = [
+            {"q": r["q"], "p": r["p"], "d": r["d"], "vol": _fmt_vol(r["vol_num"]),
+             "lon": r["lon"], "lat": r["lat"]}
+            for r in rows
+        ]
+        return {
+            "data": data,
+            "meta": {
+                "source": "polymarket-gamma",
+                "asof": asof.isoformat(timespec="seconds"),
+                "stale": age_min > PM_STALE_MINUTES,
+            },
+        }
+    except Exception as err:
+        log.warning("v_pm indisponible (%s) — repli fixture démo", err)
+        return envelope("pm")
 
 
 @app.get("/", include_in_schema=False)

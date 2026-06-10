@@ -1,0 +1,31 @@
+# Mapping Polymarket : catégories front → tags Gamma API.
+# Vérifié le 2026-06-10 contre gamma-api.polymarket.com (/events?tag_slug=…).
+# quota   : nombre de livres affichés par catégorie (total = 8, forme front)
+# anchor  : ancrage carte (le calque PM du Monitor) ; les livres suivants
+#           d'une même catégorie sont décalés pour rester lisibles
+# collect_all : historiser TOUS les marchés actifs de la catégorie (pas
+#           seulement les affichés) — requis sur fed pour l'analyse RV
+#           vs CME FedWatch (un point par collecte, timestampé)
+
+stale_after_minutes: 30
+events_per_category: 25
+
+categories:
+  fed:
+    label: Fed / politique monétaire
+    tag_slug: fed
+    quota: 3
+    collect_all: true
+    anchor: {lon: -77.04, lat: 38.89}   # Washington DC
+  elections:
+    label: Élections
+    tag_slug: elections
+    quota: 2
+    collect_all: false
+    anchor: {lon: -98.5, lat: 39.8}     # centre US (défaut, marchés majoritairement US)
+  geopolitics:
+    label: Géopolitique
+    tag_slug: geopolitics
+    quota: 3
+    collect_all: false
+    anchor: {lon: 35.2, lat: 31.8}      # Levant

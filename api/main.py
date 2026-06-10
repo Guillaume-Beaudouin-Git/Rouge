@@ -318,7 +318,38 @@ def intel_tdi() -> dict:
 
 @app.get("/api/intel/micro")
 def intel_micro() -> dict:
-    return envelope("micro")
+    """Vol horaire (percentile 1 an, heures UTC) + lead-lag M5 (intersection
+    stricte des timestamps) depuis le lake ; repli démo si indisponible."""
+    try:
+        hours = db.query("SELECT a, hour, pctl, live, asof_session FROM v_micro_hours")
+        ll = db.query("SELECT pair, lag, corr, n, live FROM v_micro_leadlag")
+        fixture = json.loads((DEMO_DIR / "micro.json").read_text(encoding="utf-8"))
+        order = [a["a"] for a in fixture["assets"]]
+        if len(hours) != 24 * len(order):
+            raise LookupError(f"v_micro_hours : {len(hours)} lignes")
+        by_a = {a: [0] * 24 for a in order}
+        live_a = {a: False for a in order}
+        for r in hours:
+            by_a[r["a"]][r["hour"]] = r["pctl"]
+            live_a[r["a"]] |= bool(r["live"])
+        asof = max(r["asof_session"] for r in hours).date()
+        return {
+            "data": {
+                "assets": [{"a": a, "row": by_a[a]} for a in order],
+                "leadlag": [{"pair": r["pair"], "lag": r["lag"], "corr": r["corr"]}
+                            for r in ll if r["live"]],
+            },
+            "meta": {
+                "source": "dukascopy",
+                "asof": asof.isoformat(),
+                "stale": (date.today() - asof).days > TREND_STALE_DAYS,
+                "excluded": sorted(a for a, ok in live_a.items() if not ok),
+                "leadlag_dropped": [r["pair"] for r in ll if not r["live"]],
+            },
+        }
+    except Exception as err:
+        log.warning("v_micro indisponible (%s) — repli fixture démo", err)
+        return envelope("micro")
 
 
 @app.get("/", include_in_schema=False)

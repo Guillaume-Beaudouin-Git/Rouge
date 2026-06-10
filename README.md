@@ -75,6 +75,15 @@ au fil des branchements. `meta.components`, `meta.excluded` et
 `meta.pos_missing` détaillent l'état par composante et par actif.
 Backlog des actifs/alimentations manquants : [BACKLOG.md](BACKLOG.md).
 
+## Microstructure : heures UTC et DST
+
+La heatmap de vol horaire est étiquetée en **UTC fixe**. Les sessions de
+marché locales (ouverture US 9:30 New York, fixing de Londres…) glissent
+d'une heure entre été et hiver par rapport à cette grille : un même
+créneau UTC peut couvrir deux régimes selon la saison. Le percentile par
+heure (fenêtre 1 an) lisse ce glissement mais ne le supprime pas — lire
+les heures frontières (12-14 UTC, 20-22 UTC) avec cette réserve.
+
 ## Clés API (P2)
 
 | Source | Clé | Variable `.env` |

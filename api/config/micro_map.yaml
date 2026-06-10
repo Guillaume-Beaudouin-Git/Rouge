@@ -1,0 +1,32 @@
+# Mapping microstructure : vol horaire + lead-lag depuis le M5 du lake.
+# Les 20 actifs du front (fixture micro.json) se mappent via
+# quotes_map.yaml ; NKY/BUND/TNOTE/BTC/ETH absents du lake → lignes
+# neutres live=false + meta.excluded.
+#
+# Heures en UTC, étiquetées telles quelles (note DST au README) :
+# vol horaire = somme des r² intra-heure (log-returns M5) ;
+# valeur courante = moyenne des rv_recent_sessions dernières sessions de
+# la même heure ; percentile vs distribution rv_rank_days jours de la
+# même heure du même actif.
+
+hourly:
+  rv_recent_sessions: 10
+  rv_rank_days: 252
+
+# lead-lag : cross-corrélation des rendements M5 à ±max_lag_bars barres,
+# calculée STRICTEMENT sur l'intersection des timestamps des deux jambes
+# (jamais de ffill à travers les gaps de session). Chevauchement
+# < min_overlap_bars → paire écartée et rapportée.
+leadlag:
+  window_sessions: 30
+  max_lag_bars: 12          # ±1 h en barres M5
+  min_overlap_bars: 2000
+  pairs:                    # remplace BTC→ETH et USDJPY→NKY (jambes hors lake)
+    - [NDX, SPX]
+    - [BRENT, WTI]
+    - [SPX, DAX]
+    - [GOLD, SILVER]
+    - [EURUSD, GBPUSD]
+    - [AUDUSD, COPPER]
+
+stale_after_days: 7

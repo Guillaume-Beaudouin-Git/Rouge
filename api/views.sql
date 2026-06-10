@@ -130,6 +130,21 @@ WHERE asof_session = (SELECT max(asof_session)
                       FROM read_parquet('data/tdi/date=*/part.parquet'))
 ORDER BY abs(z) DESC;
 
+-- ============================================================ MICRO
+CREATE OR REPLACE VIEW v_micro_hours AS
+SELECT a, hour, pctl, live, asof_session
+FROM read_parquet('data/micro_hours/date=*/part.parquet')
+WHERE asof_session = (SELECT max(asof_session)
+                      FROM read_parquet('data/micro_hours/date=*/part.parquet'))
+ORDER BY a, hour;
+
+CREATE OR REPLACE VIEW v_micro_leadlag AS
+SELECT pair, lag, corr, n, live, asof_session
+FROM read_parquet('data/micro_leadlag/date=*/part.parquet')
+WHERE asof_session = (SELECT max(asof_session)
+                      FROM read_parquet('data/micro_leadlag/date=*/part.parquet'))
+ORDER BY abs(corr) DESC NULLS LAST;
+
 -- ============================================================ à venir (P2)
 -- v_macro    → GET /api/intel/macro
 -- v_trend    → GET /api/intel/trend

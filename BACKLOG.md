@@ -19,10 +19,19 @@ Règle en attendant : ligne neutre `live=false`, composantes à 0, listés dans
   mesure que les composantes s'allument ; pas de renormalisation, biais
   conservateur assumé (documenté README).
 
+## Strip marchés (MKT, vue brief/accueil) — reste en démo
+
+Seuls 2/6 symboles du strip sont dans le lake (WTI→USOIL, GOLD→XAUUSD).
+VIX, DXY, US 10A et BTC demandent des sources dédiées :
+
+| Symbole | Source candidate |
+|---|---|
+| VIX | CBOE (delayed) ou futures VIX |
+| DXY | ICE — ou panier synthétique depuis les jambes USD du lake |
+| US 10A | FRED (DGS10, J-1) ou futures taux |
+| BTC | API exchange (même source que TREND BTC/ETH) |
+
 ## Autres modules front encore en fixtures démo
 
-- FX (force G8 inverse-vol + 28 paires) : dérivable du même lake quotes —
-  candidat naturel après macro/GDELT.
-- Saisonnalité, TDI, Micro : dérivables des quotes daily/M5.
 - AIS (AISStream), MIL (OpenSky) : P2 fin de file, clés à provisionner.
 - ZONES (convergence) : produit interne, fusion pondérée des calques — P3+.

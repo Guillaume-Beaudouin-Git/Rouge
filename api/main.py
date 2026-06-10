@@ -294,7 +294,26 @@ def intel_season() -> dict:
 
 @app.get("/api/intel/tdi")
 def intel_tdi() -> dict:
-    return envelope("tdi")
+    """12 divergences pair-based (log-spread, z vs fenêtre) depuis le lake
+    quotes ; lignes excluded explicites si jambe absente ; repli démo."""
+    try:
+        rows = db.query("SELECT flux, met, z, note, live, asof_session FROM v_tdi")
+        if len(rows) != 12:
+            raise LookupError(f"v_tdi : {len(rows)} lignes")
+        asof = max(r["asof_session"] for r in rows).date()
+        return {
+            "data": [{"flux": r["flux"], "met": r["met"], "z": r["z"],
+                      "note": r["note"]} for r in rows],
+            "meta": {
+                "source": "dukascopy",
+                "asof": asof.isoformat(),
+                "stale": (date.today() - asof).days > TREND_STALE_DAYS,
+                "excluded": [r["met"] for r in rows if not r["live"]],
+            },
+        }
+    except Exception as err:
+        log.warning("v_tdi indisponible (%s) — repli fixture démo", err)
+        return envelope("tdi")
 
 
 @app.get("/api/intel/micro")

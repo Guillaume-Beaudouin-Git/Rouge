@@ -122,6 +122,14 @@ WHERE asof_session = (SELECT max(asof_session)
                       FROM read_parquet('data/season/date=*/part.parquet'))
 ORDER BY sym, month;
 
+-- ============================================================ TDI
+CREATE OR REPLACE VIEW v_tdi AS
+SELECT flux, met, z, note, live, asof_session
+FROM read_parquet('data/tdi/date=*/part.parquet')
+WHERE asof_session = (SELECT max(asof_session)
+                      FROM read_parquet('data/tdi/date=*/part.parquet'))
+ORDER BY abs(z) DESC;
+
 -- ============================================================ à venir (P2)
 -- v_macro    → GET /api/intel/macro
 -- v_trend    → GET /api/intel/trend

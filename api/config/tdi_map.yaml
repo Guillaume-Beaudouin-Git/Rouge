@@ -1,0 +1,23 @@
+# Mapping TDI : 12 divergences calculées depuis le lake quotes.
+# Contrat front relevé (rouge.html, const TDI) : {flux, met, z, note},
+# tri |z| décroissant. Méthode unique : spread en log des deux jambes
+# (sessions communes uniquement), z = (spread − moyenne fenêtre) / écart-
+# type fenêtre. Jambe absente du lake → ligne excluded, jamais substituée.
+
+# fenêtre du z en sessions (défaut, surchargée par ligne si besoin)
+window: 60
+stale_after_days: 7
+
+divergences:
+  - {flux: ENE, met: "Spread WTI – Brent",              a: WTI,    b: BRENT}
+  - {flux: MET, met: "Ratio or / argent",               a: GOLD,   b: SILVER}
+  - {flux: FX,  met: "AUD vs cuivre",                   a: AUDUSD, b: COPPER}
+  - {flux: FX,  met: "CAD vs WTI (pétro-devise)",       a: USDCAD, b: WTI}
+  - {flux: IND, met: "NDX vs SPX (rotation growth)",    a: NDX,    b: SPX}
+  - {flux: IND, met: "DAX vs SPX (RV transatlantique)", a: DAX,    b: SPX}
+  - {flux: ENE, met: "Gaz nat. vs WTI (énergie RV)",    a: NATGAS, b: WTI}
+  - {flux: FX,  met: "EUR vs GBP (Europe RV)",          a: EURUSD, b: GBPUSD}
+  - {flux: FX,  met: "AUD vs NZD (antipodes)",          a: AUDUSD, b: NZDUSD}
+  - {flux: MET, met: "Or vs USD/JPY (refuge)",          a: GOLD,   b: USDJPY}
+  - {flux: FX,  met: "USD/JPY vs SPX (carry-risque)",   a: USDJPY, b: SPX}
+  - {flux: MET, met: "Cuivre vs or (cycle vs refuge)",  a: COPPER, b: GOLD}

@@ -256,7 +256,40 @@ def intel_pm() -> dict:
 
 @app.get("/api/intel/season")
 def intel_season() -> dict:
-    return envelope("season")
+    """Saisonnalité réelle (retours mensuels moyens + hit-rate, pas
+    d'annualisation) depuis quotes_daily ; repli démo si indisponible."""
+    try:
+        rows = db.query("SELECT sym, month, mean_pct, hit_pct, n_years, live, "
+                        "asof_session FROM v_season")
+        fixture = json.loads((DEMO_DIR / "season.json").read_text(encoding="utf-8"))
+        assets = fixture["assets"]
+        if len(rows) != 12 * len(assets):
+            raise LookupError(f"v_season : {len(rows)} lignes")
+        by_sym: dict[str, list] = {}
+        hit: dict[str, list] = {}
+        years: dict[str, int] = {}
+        excluded = []
+        for sym in assets:
+            sr = sorted((r for r in rows if r["sym"] == sym), key=lambda r: r["month"])
+            by_sym[sym] = [r["mean_pct"] for r in sr]
+            hit[sym] = [r["hit_pct"] for r in sr]
+            years[sym] = max(r["n_years"] for r in sr)
+            if not sr[0]["live"]:
+                excluded.append(sym)
+        asof = max(r["asof_session"] for r in rows).date()
+        return {
+            "data": {"assets": assets, "bias": by_sym, "hit": hit},
+            "meta": {
+                "source": "dukascopy",
+                "asof": asof.isoformat(),
+                "stale": (date.today() - asof).days > TREND_STALE_DAYS,
+                "years_used": years,
+                "excluded": excluded,
+            },
+        }
+    except Exception as err:
+        log.warning("v_season indisponible (%s) — repli fixture démo", err)
+        return envelope("season")
 
 
 @app.get("/api/intel/tdi")

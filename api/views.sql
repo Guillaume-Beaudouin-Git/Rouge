@@ -114,6 +114,14 @@ WHERE asof_session = (SELECT max(asof_session)
                       FROM read_parquet('data/fx_pairs/date=*/part.parquet'))
 ORDER BY abs(diff) DESC;
 
+-- ============================================================ SEASON
+CREATE OR REPLACE VIEW v_season AS
+SELECT sym, month, mean_pct, hit_pct, n_years, live, asof_session
+FROM read_parquet('data/season/date=*/part.parquet')
+WHERE asof_session = (SELECT max(asof_session)
+                      FROM read_parquet('data/season/date=*/part.parquet'))
+ORDER BY sym, month;
+
 -- ============================================================ à venir (P2)
 -- v_macro    → GET /api/intel/macro
 -- v_trend    → GET /api/intel/trend

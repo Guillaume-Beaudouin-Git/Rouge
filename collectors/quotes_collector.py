@@ -12,7 +12,7 @@ minuit UTC implicite. Convention identique FX / métaux / indices / énergies.
 from __future__ import annotations
 
 import os
-from datetime import date, timedelta
+from datetime import date
 from pathlib import Path
 
 import pandas as pd
@@ -22,9 +22,9 @@ from collectors.base import REPO_ROOT, BaseCollector
 
 MAP_PATH = REPO_ROOT / "api" / "config" / "quotes_map.yaml"
 
-#: profondeur chargée : 252 sessions de lookback momentum + 252 de
-#: fenêtre de rang vol + 31 de série g + marge week-ends/fériés
-LOOKBACK_DAYS = 900
+#: profondeur chargée : historique COMPLET du lake — nécessaire à la
+#: saisonnalité (FX ~19 ans) ; trend/fx font leur .tail() eux-mêmes
+FULL_SINCE = date(2003, 1, 1)
 
 
 def load_quotes_map(path: Path = MAP_PATH) -> dict:
@@ -104,7 +104,7 @@ class QuotesCollector(BaseCollector):
     # -------------------------------------------------------------- collect
 
     def collect(self) -> pd.DataFrame:
-        since = date.today() - timedelta(days=LOOKBACK_DAYS)
+        since = FULL_SINCE
         frames = []
         for inst in self.cfg["instruments"]:
             if "excluded" in inst:

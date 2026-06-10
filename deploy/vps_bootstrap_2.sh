@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # ROUGE — bootstrap VPS phase 2 (sudo, APRÈS clone + venv + .env dans /tmp).
-# Usage : ssh -t … 'sudo bash -s' < ~/rouge/deploy/vps_bootstrap_2.sh
+# Usage (Terminal séparé — TTY requis pour sudo et caddy hash-password) :
+#   scp -i ~/.ssh/hetzner_algo_claude deploy/vps_bootstrap_2.sh algo@178.104.200.63:/tmp/
+#   ssh -t -i ~/.ssh/hetzner_algo_claude algo@178.104.200.63 "sudo bash /tmp/vps_bootstrap_2.sh"
 # Fait : .env en place, services systemd, Caddy (demande le mot de passe
 # Basic Auth en interactif).
 set -euo pipefail

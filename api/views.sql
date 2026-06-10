@@ -98,6 +98,22 @@ WHERE snapshot_ts = (SELECT max(snapshot_ts)
                      FROM read_parquet('data/news_sel/date=*/part-*.parquet'))
 ORDER BY w DESC, ts DESC;
 
+-- ============================================================ FX
+-- Force G8 + 28 paires assemblées par collectors/fx_builder.py.
+CREATE OR REPLACE VIEW v_fx_strength AS
+SELECT c, iso, now, s, asof_session
+FROM read_parquet('data/fx_strength/date=*/part.parquet')
+WHERE asof_session = (SELECT max(asof_session)
+                      FROM read_parquet('data/fx_strength/date=*/part.parquet'))
+ORDER BY now DESC;
+
+CREATE OR REPLACE VIEW v_fx_pairs AS
+SELECT p, b, q, diff, trend, conflict, asof_session
+FROM read_parquet('data/fx_pairs/date=*/part.parquet')
+WHERE asof_session = (SELECT max(asof_session)
+                      FROM read_parquet('data/fx_pairs/date=*/part.parquet'))
+ORDER BY abs(diff) DESC;
+
 -- ============================================================ à venir (P2)
 -- v_macro    → GET /api/intel/macro
 -- v_trend    → GET /api/intel/trend

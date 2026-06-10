@@ -185,7 +185,31 @@ def intel_trend() -> dict:
 
 @app.get("/api/intel/fx")
 def intel_fx() -> dict:
-    return envelope("fx")
+    """Force G8 + 28 paires depuis le lake quotes (croisées synthétiques
+    via jambes USD). Conflit = sens de la paire vs signe du différentiel
+    de force ; repli démo si le data lake est indisponible."""
+    try:
+        strength = db.query("SELECT c, iso, now, s, asof_session FROM v_fx_strength")
+        pairs = db.query("SELECT p, b, q, diff, trend, conflict FROM v_fx_pairs")
+        if len(strength) != 8 or len(pairs) != 28:
+            raise LookupError(f"v_fx : {len(strength)} devises / {len(pairs)} paires")
+        asof = max(r["asof_session"] for r in strength).date()
+        return {
+            "data": {
+                "strength": [{"c": r["c"], "iso": r["iso"], "now": r["now"],
+                              "s": list(r["s"])} for r in strength],
+                "pairs": pairs,
+            },
+            "meta": {
+                "source": "dukascopy",
+                "asof": asof.isoformat(),
+                "stale": (date.today() - asof).days > TREND_STALE_DAYS,
+                "conflict_rate": round(sum(p["conflict"] for p in pairs) / 28, 2),
+            },
+        }
+    except Exception as err:
+        log.warning("v_fx indisponible (%s) — repli fixture démo", err)
+        return envelope("fx")
 
 
 @app.get("/api/intel/markets")

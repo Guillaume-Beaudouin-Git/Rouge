@@ -64,6 +64,7 @@ def health() -> dict:
 
 NEWS_STALE_MINUTES = 60  # cf. news_map.yaml stale_after_minutes
 MIL_STALE_MINUTES = 30   # cf. mil_filter.yaml stale_after_minutes
+AIS_STALE_MINUTES = 15   # cf. ais_map.yaml stale_after_minutes
 
 
 @app.get("/api/monitor/layers")
@@ -96,6 +97,18 @@ def monitor_layers() -> dict:
         log.warning("v_news indisponible (%s) — bloc news en fixture démo", err)
 
     try:
+        rows = db.query("SELECT lon, lat, type, snapshot_ts FROM v_ais")
+        if not rows:
+            raise LookupError("v_ais vide")
+        snap, age_min = _snap_age(rows)
+        body["data"]["ais"] = [{"lon": r["lon"], "lat": r["lat"], "type": r["type"]}
+                               for r in rows]
+        blocks["ais"] = "stale" if age_min > AIS_STALE_MINUTES else "live"
+        asofs.append(snap)
+    except Exception as err:
+        log.warning("v_ais indisponible (%s) — bloc ais en fixture démo", err)
+
+    try:
         rows = db.query("SELECT lon, lat, label, snapshot_ts FROM v_mil")
         if not rows:
             raise LookupError("v_mil vide")
@@ -108,9 +121,11 @@ def monitor_layers() -> dict:
 
     live_blocks = [b for b in blocks.values() if b != "demo"]
     if asofs:
+        srcs = {"gdelt" if blocks["news"] != "demo" else "",
+                "opensky" if blocks["mil"] != "demo" else "",
+                "aisstream" if blocks["ais"] != "demo" else ""} - {""}
         body["meta"] = {
-            "source": "+".join(sorted({"gdelt" if blocks["news"] != "demo" else "",
-                                       "opensky" if blocks["mil"] != "demo" else ""} - {""})) + "+demo",
+            "source": "+".join(sorted(srcs)) + "+demo",
             "asof": max(asofs).isoformat(timespec="seconds"),
             "stale": all(b == "stale" for b in live_blocks),
         }

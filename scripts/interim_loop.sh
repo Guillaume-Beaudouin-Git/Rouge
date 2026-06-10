@@ -11,8 +11,26 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 PIDFILE=_logs/interim_loop.pid
+AIS_PIDFILE=_logs/ais_ws.pid
 LOG=_logs/interim_loop.log
 PY=venv/bin/python
+
+ais_start() {
+  if [[ -f "$AIS_PIDFILE" ]] && kill -0 "$(cat "$AIS_PIDFILE")" 2>/dev/null; then
+    echo "daemon AIS déjà en cours (pid $(cat "$AIS_PIDFILE"))"; return
+  fi
+  nohup "$PY" -m collectors.ais_ws >> "$LOG" 2>&1 &
+  echo $! > "$AIS_PIDFILE"
+  disown
+  echo "daemon AIS démarré (pid $(cat "$AIS_PIDFILE"))"
+}
+
+ais_stop() {
+  if [[ -f "$AIS_PIDFILE" ]]; then
+    kill "$(cat "$AIS_PIDFILE")" 2>/dev/null && echo "daemon AIS arrêté" || echo "daemon AIS absent"
+    rm -f "$AIS_PIDFILE"
+  fi
+}
 
 loop() {
   echo "[interim] boucle démarrée pid=$$" >> "$LOG"
@@ -46,6 +64,7 @@ case "${1:-}" in
     echo $! > "$PIDFILE"
     disown
     echo "démarré (pid $(cat "$PIDFILE")) — log: $LOG"
+    ais_start
     ;;
   _run) loop ;;
   stop)
@@ -55,12 +74,18 @@ case "${1:-}" in
     else
       echo "pas de PID file"
     fi
+    ais_stop
     ;;
   status)
     if [[ -f "$PIDFILE" ]] && kill -0 "$(cat "$PIDFILE")" 2>/dev/null; then
-      echo "en cours (pid $(cat "$PIDFILE"))"
+      echo "boucle en cours (pid $(cat "$PIDFILE"))"
     else
-      echo "arrêté"
+      echo "boucle arrêtée"
+    fi
+    if [[ -f "$AIS_PIDFILE" ]] && kill -0 "$(cat "$AIS_PIDFILE")" 2>/dev/null; then
+      echo "daemon AIS en cours (pid $(cat "$AIS_PIDFILE"))"
+    else
+      echo "daemon AIS arrêté"
     fi
     ;;
   *) echo "usage: $0 start|stop|status"; exit 1 ;;

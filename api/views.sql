@@ -167,6 +167,16 @@ WHERE snapshot_ts = (SELECT max(snapshot_ts)
                      FROM read_parquet('data/mil/date=*/part-*.parquet'))
 ORDER BY label;
 
--- ============================================================ à venir (P2)
+-- ============================================================ AIS
+-- Navires (AISStream, daemon ais_ws) — dernier snapshot (~40 navires
+-- downsamplés par corridor).
+CREATE OR REPLACE VIEW v_ais AS
+SELECT mmsi, lon, lat, type, corridor, ts, snapshot_ts
+FROM read_parquet('data/ais/date=*/part-*.parquet')
+WHERE snapshot_ts = (SELECT max(snapshot_ts)
+                     FROM read_parquet('data/ais/date=*/part-*.parquet'))
+ORDER BY corridor, ts DESC;
+
+-- ============================================================ à venir
 -- v_markets  → GET /api/intel/markets (BACKLOG : sources dédiées)
--- v_layers   → blocs ais/zones (P2 en cours)
+-- zones      → calque de fusion à dériver des autres calques (BACKLOG)

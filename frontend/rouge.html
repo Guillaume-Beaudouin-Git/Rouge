@@ -514,8 +514,8 @@ async function loadData(endpoint,demoConst){
     const r=await fetch(endpoint,{signal:ctrl.signal});clearTimeout(tm);
     if(!r.ok)throw new Error('HTTP '+r.status);
     const j=await r.json();
-    return {data:j.data,status:j.meta&&j.meta.stale?'stale':'live'};
-  }catch(e){return {data:demoConst,status:'demo'}}
+    return {data:j.data,status:j.meta&&j.meta.stale?'stale':'live',meta:j.meta||{}};
+  }catch(e){return {data:demoConst,status:'demo',meta:{}}}
 }
 
 /* ================= HORLOGE & ROUTEUR ================= */
@@ -573,13 +573,13 @@ function buildMonitor(){
     const core=svgEl('circle',{cx:x,cy:y,r:3,fill:col});
     const halo=svgEl('circle',{cx:x,cy:y,r:z.r,fill:col,opacity:.05});
     const t=svgEl('text',{x:x,y:y-z.r-5,'text-anchor':'middle','font-size':8,fill:col,'letter-spacing':1.5});t.textContent=z.name+' · '+z.lvl;
-    [halo,ring,core,t].forEach(e=>{e.dataset.tip=z.name+' — niveau '+z.lvl+srcNote('layers');G.zones.appendChild(e)})});
+    [halo,ring,core,t].forEach(e=>{e.dataset.tip=z.name+' — niveau '+z.lvl+srcNote('zones');G.zones.appendChild(e)})});
 
   /* NEWS */
   NEWSPTS.forEach(n=>{const x=X(n[0]),y=Y(n[1]),r=2+n[2]*1.6;
     const c=svgEl('circle',{cx:x,cy:y,r,fill:'none',stroke:'var(--bone)','stroke-width':.8,opacity:.8});
     const d=svgEl('circle',{cx:x,cy:y,r:1.4,fill:'var(--bone)'});
-    c.dataset.tip='NEWS · '+n[3]+srcNote('layers');d.dataset.tip=c.dataset.tip;
+    c.dataset.tip='NEWS · '+n[3]+(n[4]?' — '+n[4]:'')+srcNote('news');d.dataset.tip=c.dataset.tip;
     G.news.appendChild(c);G.news.appendChild(d)});
 
   /* PM */
@@ -598,12 +598,12 @@ function buildMonitor(){
 
   /* AIS */
   AIS.forEach(s=>{const e=svgEl('rect',{x:X(s.lon)-1.4,y:Y(s.lat)-1.4,width:2.8,height:2.8,fill:s.type==='TANKER'?'var(--rouge-hi)':'var(--steel)',opacity:.9});
-    e.dataset.tip='AIS · '+s.type+srcNote('layers');G.ais.appendChild(e)});
+    e.dataset.tip='AIS · '+s.type+srcNote('ais');G.ais.appendChild(e)});
 
   /* MIL */
   MILPTS.forEach(m=>{const x=X(m[0]),y=Y(m[1]);
     const tri=svgEl('path',{d:`M${x} ${y-4} L${x+3.4} ${y+2.6} L${x-3.4} ${y+2.6} Z`,fill:'none',stroke:'var(--bone)','stroke-width':1,class:'blink'});
-    tri.dataset.tip='MIL · '+m[2]+srcNote('layers');G.mil.appendChild(tri)});
+    tri.dataset.tip='MIL · '+m[2]+srcNote('mil');G.mil.appendChild(tri)});
 
   /* POP */
   CITIES.forEach(c=>{const e=svgEl('circle',{cx:X(c[1]),cy:Y(c[2]),r:Math.sqrt(c[3])*0.65,fill:'var(--bone)',opacity:.18});
@@ -903,8 +903,12 @@ const DATA_READY=(async()=>{
   FXS=fx.data.strength;PAIRS=fx.data.pairs;DATA_STATE.fx=fx.status;
   MKT=markets.data;DATA_STATE.markets=markets.status;
   PMARKETS=pm.data;DATA_STATE.pm=pm.status;
-  /* rail monitor : compteurs + source par calque (pm suit l'endpoint intel/pm) */
-  [['zones',ZONES,'layers'],['news',NEWSPTS,'layers'],['ais',AIS,'layers'],['mil',MILPTS,'layers'],['ref',CHOKE,'layers'],['pm',PMARKETS,'pm']]
+  /* rail monitor : compteurs + source PAR BLOC (meta.blocks de l'endpoint
+     layers : un calque peut être live pendant que les autres restent démo ;
+     pm suit l'endpoint intel/pm) */
+  const blocks=layers.meta.blocks||{};
+  ['zones','news','ais','mil','choke'].forEach(b=>{DATA_STATE[b]=layers.status==='demo'?'demo':(blocks[b]||layers.status)});
+  [['zones',ZONES,'zones'],['news',NEWSPTS,'news'],['ais',AIS,'ais'],['mil',MILPTS,'mil'],['ref',CHOKE,'choke'],['pm',PMARKETS,'pm']]
     .forEach(([id,arr,k])=>{const l=LAYERS.find(x=>x.id===id);l.n=arr.length;l.src=DATA_STATE[k]});
   renderHome();
   if(document.getElementById('view-intel').classList.contains('on'))renderIntel();

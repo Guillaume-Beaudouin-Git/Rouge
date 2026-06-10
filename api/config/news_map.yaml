@@ -1,0 +1,29 @@
+# Mapping NEWS : catégories du front → thèmes GDELT GKG (V1Themes).
+# Choix et fréquences vérifiés le 2026-06-10 sur un fichier 15 min réel —
+# cf. docs/decisions/gdelt_source.md. Matching par token exact.
+
+# anti-bruit (testé dans tests/test_news_collector.py)
+window_hours: 24        # fenêtre glissante servie
+cluster_km: 50          # regroupement des points proches, même catégorie
+serve_max: 18           # cap de points servis (15-20)
+category_max: 5         # cap par catégorie — sans lui, le volume électoral
+                        # US écrase énergie/conflits/shipping (mesuré)
+recency_halflife_hours: 12  # score = volume × exp(-âge/demi-vie)
+stale_after_minutes: 60     # cadence GDELT 15 min → stale au-delà d'1 h
+
+categories:
+  energie:
+    label: Énergie
+    themes: [ENV_OIL, ECON_OILPRICE, ENV_NATURALGAS, FUELPRICES]
+  banques_centrales:
+    label: Banques centrales & macro
+    themes: [ECON_CENTRALBANK, ECON_INFLATION]
+  conflits:
+    label: Conflits & sécurité
+    themes: [ARMEDCONFLICT, BLOCKADE, SANCTIONS, TERROR]
+  shipping:
+    label: Shipping & chokepoints
+    themes: [MARITIME, MARITIME_INCIDENT, MARITIME_PIRACY]
+  marches:
+    label: Marchés & élections
+    themes: [ECON_STOCKMARKET, ELECTION]

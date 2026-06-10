@@ -63,6 +63,18 @@ GET /api/intel/markets    → strip cotations
 GET /api/intel/pm         → questions, prix, volume, delta
 ```
 
+## Score TREND : composantes partielles
+
+`g = 0.35·mom + 0.20·mac + 0.15·(pos + risk + flow)`. Tant que les
+collecteurs macro (`mac`) et flux (`flow`) ne sont pas branchés, ces
+composantes valent 0 **sans renormalisation** : le score brut est inchangé
+et les verdicts (seuil ±18) sont mécaniquement conservateurs.
+`meta.effective_weight` expose la part du poids total portée par des
+composantes live (0.65 aujourd'hui : mom+pos+risk) — elle remontera à 1.0
+au fil des branchements. `meta.components`, `meta.excluded` et
+`meta.pos_missing` détaillent l'état par composante et par actif.
+Backlog des actifs/alimentations manquants : [BACKLOG.md](BACKLOG.md).
+
 ## Clés API (P2)
 
 | Source | Clé | Variable `.env` |

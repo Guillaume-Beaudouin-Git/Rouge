@@ -84,6 +84,20 @@ FROM v_trend_raw
 WHERE asof_session = (SELECT max(asof_session) FROM v_trend_raw)
 ORDER BY g DESC;
 
+-- ============================================================ NEWS
+-- Brut : un point par article matché par collecte GKG 15 min.
+CREATE OR REPLACE VIEW v_news_raw AS
+SELECT * FROM read_parquet('data/news_raw/date=*/part-*.parquet');
+
+-- GET /api/monitor/layers (bloc news) — sélection anti-bruit du dernier
+-- snapshot : dédup + clusters <50 km + cap, calculée par news_collector.
+CREATE OR REPLACE VIEW v_news AS
+SELECT lon, lat, w, title, source, ts, category, n, snapshot_ts
+FROM read_parquet('data/news_sel/date=*/part-*.parquet')
+WHERE snapshot_ts = (SELECT max(snapshot_ts)
+                     FROM read_parquet('data/news_sel/date=*/part-*.parquet'))
+ORDER BY w DESC, ts DESC;
+
 -- ============================================================ à venir (P2)
 -- v_macro    → GET /api/intel/macro
 -- v_trend    → GET /api/intel/trend

@@ -62,9 +62,39 @@ def health() -> dict:
     return {"status": "ok", "env": ROUGE_ENV}
 
 
+NEWS_STALE_MINUTES = 60  # cf. news_map.yaml stale_after_minutes
+
+
 @app.get("/api/monitor/layers")
 def monitor_layers() -> dict:
-    return envelope("layers")
+    """Calques carte. Blocs branchés au fil de P2 : news est live (GDELT),
+    le reste sert encore la fixture démo — l'état par bloc est exposé dans
+    meta.blocks pour les badges par calque du front."""
+    body = envelope("layers")
+    blocks = {k: "demo" for k in ("news", "pm", "ais", "mil", "choke", "zones")}
+    try:
+        rows = db.query(
+            "SELECT lon, lat, w, title, source, ts, snapshot_ts FROM v_news"
+        )
+        if not rows:
+            raise LookupError("v_news vide")
+        snap = rows[0]["snapshot_ts"]
+        snap = snap.replace(tzinfo=timezone.utc) if snap.tzinfo is None else snap.astimezone(timezone.utc)
+        age_min = (datetime.now(timezone.utc) - snap).total_seconds() / 60
+        stale = age_min > NEWS_STALE_MINUTES
+        body["data"]["news"] = [
+            [r["lon"], r["lat"], r["w"], r["title"], r["source"],
+             r["ts"].astimezone(timezone.utc).isoformat(timespec="seconds")]
+            for r in rows
+        ]
+        blocks["news"] = "stale" if stale else "live"
+        body["meta"] = {"source": "gdelt+demo",
+                        "asof": snap.isoformat(timespec="seconds"),
+                        "stale": stale}
+    except Exception as err:
+        log.warning("v_news indisponible (%s) — bloc news en fixture démo", err)
+    body["meta"]["blocks"] = blocks
+    return body
 
 
 #: seuil de péremption par dataset (jours depuis la date de référence)
@@ -139,6 +169,10 @@ def intel_trend() -> dict:
                 "stale": (date.today() - asof).days > TREND_STALE_DAYS,
                 "components": {"mom": True, "mac": False, "pos": True,
                                "risk": True, "flow": False},
+                # part du poids total du score portée par des composantes
+                # live (pas de renormalisation : verdicts conservateurs
+                # tant que mac/flow ne sont pas branchés)
+                "effective_weight": 0.65,
                 "excluded": sorted(r["sym"] for r in rows if not r["live"]),
                 "pos_missing": sorted(
                     r["sym"] for r in rows if r["live"] and not r["pos_available"]),

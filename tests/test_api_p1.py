@@ -64,8 +64,8 @@ def test_layers_shape() -> None:
     for z in data["zones"]:
         assert set(z) == {"name", "lon", "lat", "r", "lvl"}
         assert z["lvl"] in {"CRITIQUE", "ÉLEVÉ", "MOYEN"}
-    for n in data["news"]:  # [lon, lat, intensité, titre]
-        assert len(n) == 4 and is_num(n[0]) and is_num(n[1]) and is_num(n[2]) and isinstance(n[3], str)
+    for n in data["news"]:  # [lon, lat, intensité, titre, (source, ts si live)]
+        assert len(n) >= 4 and is_num(n[0]) and is_num(n[1]) and is_num(n[2]) and isinstance(n[3], str)
     for s in data["ais"]:
         assert set(s) == {"lon", "lat", "type"} and s["type"] in {"TANKER", "CARGO"}
     for m in data["mil"]:  # [lon, lat, libellé]

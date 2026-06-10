@@ -1,0 +1,47 @@
+# Composante mac du score TREND ← scores de surprise macro (macro_scores).
+# mac(actif) = clip(scale × Δmom, ±50), où mom = z moyen des 5 dernières
+# surprises de la devise (premier print vs consensus, cf. vintage).
+#
+# Gate de suffisance : une devise n'alimente mac que si elle a >= min_n
+# surprises scorées ; sinon la composante reste 0 + flag (état honnête —
+# avec history_n=0 au démarrage, tout est neutre et effective_weight
+# remonte de 0.65 vers 0.85 au fil du remplissage).
+#
+# Règles par type d'actif :
+#   paire FX   → score(base) − score(quote)
+#   indice     → devise locale
+#   métaux / énergie / crypto → NEUTRE ASSUMÉ : pas de devise macro propre
+#     (l'or réagit aux taux réels US mais avec un signe instable selon le
+#     régime — on ne modélise pas ça ici, on l'assume neutre)
+#   taux       → devise locale (actifs exclus du lake de toute façon)
+
+scale: 20
+min_n: 5
+
+assets:
+  EURUSD: {base: EUR, quote: USD}
+  GBPUSD: {base: GBP, quote: USD}
+  USDJPY: {base: USD, quote: JPY}
+  AUDUSD: {base: AUD, quote: USD}
+  USDCAD: {base: USD, quote: CAD}
+  USDCHF: {base: USD, quote: CHF}
+  NZDUSD: {neutral: "NZD hors devises macro front (8 devises, pas de NZD)"}
+  EURJPY: {base: EUR, quote: JPY}
+  EURGBP: {base: EUR, quote: GBP}
+  AUDJPY: {base: AUD, quote: JPY}
+  SPX:    {local: USD}
+  NDX:    {local: USD}
+  DAX:    {local: EUR}
+  NKY:    {local: JPY}
+  FTSE:   {local: GBP}
+  CAC:    {local: EUR}
+  GOLD:   {neutral: "métal — neutre assumé (cf. en-tête)"}
+  SILVER: {neutral: "métal — neutre assumé"}
+  COPPER: {neutral: "métal — neutre assumé"}
+  WTI:    {neutral: "énergie — neutre assumé"}
+  BRENT:  {neutral: "énergie — neutre assumé"}
+  NATGAS: {neutral: "énergie — neutre assumé"}
+  BUND:   {local: EUR}
+  TNOTE:  {local: USD}
+  BTC:    {neutral: "crypto — neutre assumé"}
+  ETH:    {neutral: "crypto — neutre assumé"}

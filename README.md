@@ -65,14 +65,21 @@ GET /api/intel/pm         → questions, prix, volume, delta
 
 ## Score TREND : composantes partielles
 
-`g = 0.35·mom + 0.20·mac + 0.15·(pos + risk + flow)`. Tant que les
-collecteurs macro (`mac`) et flux (`flow`) ne sont pas branchés, ces
-composantes valent 0 **sans renormalisation** : le score brut est inchangé
+`g = 0.35·mom + 0.20·mac + 0.15·(pos + risk + flow)`. Les composantes non
+disponibles valent 0 **sans renormalisation** : le score brut est inchangé
 et les verdicts (seuil ±18) sont mécaniquement conservateurs.
-`meta.effective_weight` expose la part du poids total portée par des
-composantes live (0.65 aujourd'hui : mom+pos+risk) — elle remontera à 1.0
-au fil des branchements. `meta.components`, `meta.excluded` et
-`meta.pos_missing` détaillent l'état par composante et par actif.
+
+- `mac` est branchée sur les surprises macro (trend_mac.yaml : paire FX =
+  score(base)−score(quote), indice = devise locale, métaux/énergie/crypto
+  neutres assumés) avec un **gate de suffisance** : une devise n'alimente
+  mac qu'avec ≥ 5 surprises scorées. Avec `history_n = 0` au démarrage du
+  vintage FairEconomy, la quasi-totalité des actifs reste à mac = 0 — état
+  honnête, qui se remplit au fil des collectes.
+- `flow` reste non branchée (0 partout).
+- `meta.effective_weight` est **par actif** : 0.65 (mom+risk+pos), 0.50 si
+  le COT manque aussi, 0.85 quand mac passe le gate ; `meta.components`,
+  `meta.excluded`, `meta.pos_missing` et `meta.mac_missing` détaillent
+  l'état par composante et par actif.
 Backlog des actifs/alimentations manquants : [BACKLOG.md](BACKLOG.md).
 
 ## Macro : FairEconomy et hit-rate progressif

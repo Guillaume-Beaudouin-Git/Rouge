@@ -79,7 +79,7 @@ SELECT * FROM read_parquet('data/trend/date=*/part.parquet');
 -- GET /api/intel/trend — forme front (26 lignes triées g décroissant).
 CREATE OR REPLACE VIEW v_trend AS
 SELECT cat, sym, name, f1, f2, g, mom, mac, pos, risk, flow, d30, chg,
-       live, pos_available, asof_session
+       live, pos_available, mac_available, eff_weight, asof_session
 FROM v_trend_raw
 WHERE asof_session = (SELECT max(asof_session) FROM v_trend_raw)
 ORDER BY g DESC;

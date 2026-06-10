@@ -23,6 +23,40 @@ from collectors.base import REPO_ROOT, BaseCollector
 from collectors.quotes_collector import load_quotes_map
 
 TREND_FIXTURE = REPO_ROOT / "api" / "demo" / "trend.json"
+MAC_MAP_PATH = REPO_ROOT / "api" / "config" / "trend_mac.yaml"
+
+
+def load_mac_map(path: Path = MAC_MAP_PATH) -> dict:
+    import yaml
+    cfg = yaml.safe_load(path.read_text(encoding="utf-8"))
+    front = {r["sym"] for r in json.loads(TREND_FIXTURE.read_text(encoding="utf-8"))}
+    missing = front - set(cfg["assets"])
+    if missing:
+        raise RuntimeError(f"trend_mac.yaml : actifs non mappés : {sorted(missing)}")
+    return cfg
+
+
+def mac_score(sym: str, ccy_scores: dict[str, tuple[float, int]],
+              cfg: dict) -> tuple[float, bool]:
+    """Composante mac ∈ [-50, 50] depuis les scores de surprise macro.
+    ccy_scores : devise → (mom, n). Gate : n >= min_n requis sur CHAQUE
+    devise impliquée, sinon (0, False)."""
+    rule = cfg["assets"][sym]
+    if "neutral" in rule:
+        return 0.0, False
+    min_n, scale = cfg["min_n"], cfg["scale"]
+
+    def ok(ccy: str) -> float | None:
+        mom, n = ccy_scores.get(ccy, (0.0, 0))
+        return mom if n >= min_n else None
+
+    if "local" in rule:
+        m = ok(rule["local"])
+        return (0.0, False) if m is None else (float(np.clip(scale * m, -50, 50)), True)
+    mb, mq = ok(rule["base"]), ok(rule["quote"])
+    if mb is None or mq is None:
+        return 0.0, False
+    return float(np.clip(scale * (mb - mq), -50, 50)), True
 
 #: horizons momentum (sessions) et bornes
 MOM_HORIZONS = (21, 63, 126, 252)
@@ -78,9 +112,12 @@ def pos_score(sym: str, cot_pctl: dict[str, float], links: dict) -> tuple[float,
 
 
 def build_rows(daily: dict[str, pd.DataFrame], cot_pctl: dict[str, float],
-               cfg: dict, statics: dict[str, dict]) -> pd.DataFrame:
+               cfg: dict, statics: dict[str, dict],
+               ccy_scores: dict[str, tuple[float, int]] | None = None,
+               mac_cfg: dict | None = None) -> pd.DataFrame:
     """Assemble la table TREND complète (26 lignes, triée g décroissant)."""
     links = cfg.get("cot_links", {})
+    ccy_scores = ccy_scores or {}
     rows = []
     last_session = max(df["session"].max() for df in daily.values()) if daily else None
     for inst in cfg["instruments"]:
@@ -92,6 +129,7 @@ def build_rows(daily: dict[str, pd.DataFrame], cot_pctl: dict[str, float],
             rows.append({**base, "g": 0.0, "mom": 0.0, "mac": 0.0, "pos": 0.0,
                          "risk": 0.0, "flow": 0.0, "d30": 50, "chg": 0.0,
                          "live": False, "pos_available": False,
+                         "mac_available": False, "eff_weight": 0.0,
                          "session": last_session})
             continue
         d = daily[sym].set_index("session")
@@ -99,9 +137,10 @@ def build_rows(daily: dict[str, pd.DataFrame], cot_pctl: dict[str, float],
         mom = mom_series(close)
         risk = risk_series(close)
         pos, pos_ok = pos_score(sym, cot_pctl, links)
-        # série g sur G_HIST sessions — pos COT hebdo tenu constant
-        # (approximation documentée), mac/flow neutres
-        g = 0.35 * mom + 0.20 * 0.0 + 0.15 * (pos + risk + 0.0)
+        mac, mac_ok = mac_score(sym, ccy_scores, mac_cfg) if mac_cfg else (0.0, False)
+        # série g sur G_HIST sessions — pos (COT hebdo) et mac (surprises
+        # macro) tenus constants sur la fenêtre (approximation documentée)
+        g = 0.35 * mom + 0.20 * mac + 0.15 * (pos + risk + 0.0)
         g_hist = g.dropna().tail(G_HIST)
         if len(g_hist) < 2:
             raise RuntimeError(f"{sym} : historique insuffisant ({len(g_hist)} sessions)")
@@ -109,10 +148,12 @@ def build_rows(daily: dict[str, pd.DataFrame], cot_pctl: dict[str, float],
         d30 = int(round(100 * (g_hist <= g_now).mean()))
         rows.append({**base,
                      "g": round(g_now, 1), "mom": round(mom.iloc[-1], 1),
-                     "mac": 0.0, "pos": round(pos, 1),
+                     "mac": round(mac, 1), "pos": round(pos, 1),
                      "risk": round(risk.iloc[-1], 1), "flow": 0.0,
                      "d30": d30, "chg": round(g_now - g_prev, 1),
                      "live": True, "pos_available": pos_ok,
+                     "mac_available": mac_ok,
+                     "eff_weight": round(0.35 + 0.15 + 0.15 * pos_ok + 0.20 * mac_ok, 2),
                      "session": close.index.max()})
     out = pd.DataFrame(rows).sort_values("g", ascending=False).reset_index(drop=True)
     # session de référence du build, identique sur toutes les lignes :
@@ -129,6 +170,7 @@ class TrendBuilder(BaseCollector):
     def __init__(self) -> None:
         super().__init__()
         self.cfg = load_quotes_map()
+        self.mac_cfg = load_mac_map()
         self.statics = {r["sym"]: r for r in json.loads(TREND_FIXTURE.read_text(encoding="utf-8"))}
         missing = {i["sym"] for i in self.cfg["instruments"]} ^ set(self.statics)
         if missing:
@@ -160,8 +202,17 @@ class TrendBuilder(BaseCollector):
             pctl[sym] = 100.0 * (h <= net).mean()
         return pctl
 
+    def _load_ccy_scores(self) -> dict[str, tuple[float, int]]:
+        parts = sorted((self.data_dir.parent / "macro_scores").glob("date=*/part-*.parquet"))
+        if not parts:
+            self.log.warning("macro_scores absent — composante mac neutre")
+            return {}
+        df = pd.read_parquet(parts[-1])
+        return {r["ccy"]: (float(r["mom"]), int(r["n"])) for _, r in df.iterrows()}
+
     def collect(self) -> pd.DataFrame:
-        return build_rows(self._load_daily(), self._load_cot_pctl(), self.cfg, self.statics)
+        return build_rows(self._load_daily(), self._load_cot_pctl(), self.cfg,
+                          self.statics, self._load_ccy_scores(), self.mac_cfg)
 
     def run(self) -> bool:
         try:

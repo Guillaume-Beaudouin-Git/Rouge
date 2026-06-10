@@ -151,3 +151,40 @@ def test_m5_to_daily_droppe_la_session_finale_incomplete() -> None:
     ).tz_convert("Europe/Prague")
     daily = m5_to_daily(pd.concat([week, sunday]))
     assert str(daily.index.max().date()) == "2026-06-05"
+
+
+def test_mac_score_gate_et_mapping() -> None:
+    from collectors.trend_builder import load_mac_map, mac_score
+    cfg = load_mac_map()
+    scores = {"EUR": (0.8, 6), "USD": (-0.4, 9), "JPY": (1.0, 2)}  # JPY sous le gate
+    # paire FX : base - quote, ×scale
+    v, ok = mac_score("EURUSD", scores, cfg)
+    assert ok and v == pytest.approx(cfg["scale"] * 1.2)
+    # devise sous le gate → 0 + flag, même si l'autre jambe est riche
+    assert mac_score("USDJPY", scores, cfg) == (0.0, False)
+    # indice = devise locale
+    v, ok = mac_score("SPX", scores, cfg)
+    assert ok and v == pytest.approx(cfg["scale"] * -0.4)
+    # neutre assumé
+    assert mac_score("GOLD", scores, cfg) == (0.0, False)
+    # clip ±50
+    v, _ = mac_score("EURUSD", {"EUR": (4.0, 9), "USD": (-4.0, 9)}, cfg)
+    assert v == 50.0
+
+
+def test_build_rows_eff_weight_par_actif() -> None:
+    from collectors.trend_builder import load_mac_map
+    rng = np.random.default_rng(3)
+    n = 600
+    close = _daily_close(100 * np.exp(np.linspace(0, 0.3, n) + rng.normal(0, 0.006, n).cumsum()))
+    daily = {"GOLD": close.rename("close").reset_index().rename(columns={"index": "session"})}
+    cfg = _mini_cfg()
+    statics = _statics()
+    mac_cfg = load_mac_map()
+    df = build_rows(daily, {"GOLD": 80.0}, cfg, statics, {"USD": (0.5, 9)}, mac_cfg)
+    gold = df[df["sym"] == "GOLD"].iloc[0]
+    # GOLD : neutre assumé → mac 0, eff_weight 0.65 (mom+risk+pos)
+    assert gold["mac"] == 0.0 and not gold["mac_available"]
+    assert gold["eff_weight"] == 0.65
+    nky = df[df["sym"] == "NKY"].iloc[0]
+    assert nky["eff_weight"] == 0.0

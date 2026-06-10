@@ -215,7 +215,8 @@ def intel_trend() -> dict:
     try:
         rows = db.query(
             "SELECT cat, sym, name, f1, f2, g, mom, mac, pos, risk, flow, "
-            "d30, chg, live, pos_available, asof_session FROM v_trend"
+            "d30, chg, live, pos_available, mac_available, eff_weight, "
+            "asof_session FROM v_trend"
         )
         expected = len(json.loads((DEMO_DIR / "trend.json").read_text(encoding="utf-8")))
         if len(rows) != expected:
@@ -234,12 +235,15 @@ def intel_trend() -> dict:
                 "source": "dukascopy+cftc",
                 "asof": asof.isoformat(),
                 "stale": (date.today() - asof).days > TREND_STALE_DAYS,
-                "components": {"mom": True, "mac": False, "pos": True,
-                               "risk": True, "flow": False},
-                # part du poids total du score portée par des composantes
-                # live (pas de renormalisation : verdicts conservateurs
-                # tant que mac/flow ne sont pas branchés)
-                "effective_weight": 0.65,
+                "components": {"mom": True,
+                               "mac": any(r["mac_available"] for r in rows),
+                               "pos": True, "risk": True, "flow": False},
+                # part du poids du score portée par des composantes live,
+                # PAR ACTIF (pas de renormalisation) : 0.65 sans COT ni
+                # macro, 0.85 quand mac est gated-in (assez de surprises)
+                "effective_weight": {r["sym"]: r["eff_weight"] for r in rows},
+                "mac_missing": sorted(
+                    r["sym"] for r in rows if r["live"] and not r["mac_available"]),
                 "excluded": sorted(r["sym"] for r in rows if not r["live"]),
                 "pos_missing": sorted(
                     r["sym"] for r in rows if r["live"] and not r["pos_available"]),

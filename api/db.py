@@ -37,6 +37,9 @@ def apply_views(con: duckdb.DuckDBPyConnection, root: Path,
     la liste des statements ignorés (préfixe de la 1re ligne utile)."""
     sql = sql_path.read_text(encoding="utf-8")
     sql = sql.replace("'data/", f"'{root}/data/")
+    # retire les lignes de commentaires AVANT le split : un ';' dans un
+    # commentaire fragmenterait les statements
+    sql = "\n".join(l for l in sql.splitlines() if not l.lstrip().startswith("--"))
     skipped: list[str] = []
     for stmt in sql.split(";"):
         if not stmt.strip():

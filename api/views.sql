@@ -68,6 +68,22 @@ FROM v_pm_raw
 WHERE display AND snapshot_ts = (SELECT max(snapshot_ts) FROM v_pm_raw)
 ORDER BY ord;
 
+-- ============================================================ TREND
+-- Table TREND assemblée par collectors/trend_builder.py : une partition
+-- par session de référence (jointure quotes daily + COT, mac/flow neutres
+-- flaggés). asof_session = session globale du build, identique sur les 26
+-- lignes — c'est elle qui sélectionne le dernier build complet.
+CREATE OR REPLACE VIEW v_trend_raw AS
+SELECT * FROM read_parquet('data/trend/date=*/part.parquet');
+
+-- GET /api/intel/trend — forme front (26 lignes triées g décroissant).
+CREATE OR REPLACE VIEW v_trend AS
+SELECT cat, sym, name, f1, f2, g, mom, mac, pos, risk, flow, d30, chg,
+       live, pos_available, asof_session
+FROM v_trend_raw
+WHERE asof_session = (SELECT max(asof_session) FROM v_trend_raw)
+ORDER BY g DESC;
+
 -- ============================================================ à venir (P2)
 -- v_macro    → GET /api/intel/macro
 -- v_trend    → GET /api/intel/trend

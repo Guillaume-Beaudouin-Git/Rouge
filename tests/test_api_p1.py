@@ -48,7 +48,9 @@ def test_envelope(endpoint: str) -> None:
     assert r.status_code == 200
     body = r.json()
     assert set(body) == {"data", "meta"}
-    assert set(body["meta"]) == {"source", "asof", "stale"}
+    # enveloppe minimale garantie ; les endpoints live peuvent enrichir
+    # meta (components, excluded…)
+    assert {"source", "asof", "stale"} <= set(body["meta"])
     assert isinstance(body["meta"]["source"], str)
     assert isinstance(body["meta"]["stale"], bool)
     datetime.fromisoformat(body["meta"]["asof"])  # iso8601 valide

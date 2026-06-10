@@ -1,0 +1,75 @@
+# Mapping quotes : symbole TREND front → instrument du data lake Dukascopy.
+# Relevé le 2026-06-10 par introspection du lake (lecture seule).
+#
+# Contrat de schéma (testé dans tests/test_quotes_schema.py) :
+#   m5        : {SYM}_m5_close.parquet — index DatetimeIndex tz-aware
+#               (nommé 'timestamp_utc' mais localisé Europe/Prague),
+#               colonne unique 'close' float64
+#   m1_yearly : {SYM}_{YYYY}.parquet — colonne 'ts_utc' datetime naïf UTC,
+#               colonnes open/high/low/close/volume/ask_close
+#
+# Convention daily (unique, tous instruments — testée) :
+#   close de session = dernière barre <= 17:00 America/New_York ;
+#   la session du jour J couvre (J-1 17:00 NY, J 17:00 NY].
+#   Pas de minuit UTC implicite.
+#
+# excluded : instrument absent du lake → ligne neutre (composantes à 0,
+# live=false) dans TREND, jamais de valeur simulée.
+
+lake:
+  m5_env: DUKASCOPY_LAKE_DIR
+  m1_env: DUKASCOPY_M1_DIR
+
+#: péremption : dernière session > stale_after_days → stale=true
+stale_after_days: 7
+
+instruments:
+  - {sym: EURUSD, source: m5,        file: EURUSD}
+  - {sym: GBPUSD, source: m5,        file: GBPUSD}
+  - {sym: USDJPY, source: m5,        file: USDJPY}
+  - {sym: AUDUSD, source: m5,        file: AUDUSD}
+  - {sym: USDCAD, source: m5,        file: USDCAD}
+  - {sym: USDCHF, source: m5,        file: USDCHF}
+  - {sym: NZDUSD, source: m5,        file: NZDUSD}
+  - {sym: EURJPY, source: m5,        file: EURJPY}
+  - {sym: EURGBP, source: m5,        file: EURGBP}
+  - {sym: AUDJPY, source: m5,        file: AUDJPY}
+  - {sym: SPX,    source: m5,        file: US500}
+  - {sym: NDX,    source: m5,        file: US100}
+  - {sym: DAX,    source: m5,        file: GER40}
+  - {sym: NKY,    excluded: "absent du lake Dukascopy (aucun JP225)"}
+  - {sym: FTSE,   excluded: "absent du lake Dukascopy (aucun UK100)"}
+  - {sym: CAC,    excluded: "absent du lake Dukascopy (aucun FRA40)"}
+  - {sym: GOLD,   source: m5,        file: XAUUSD}
+  - {sym: SILVER, source: m5,        file: XAGUSD}
+  - {sym: COPPER, source: m1_yearly, file: COPPER}
+  - {sym: WTI,    source: m5,        file: USOIL}
+  - {sym: BRENT,  source: m5,        file: UKOIL}
+  - {sym: NATGAS, source: m5,        file: NGAS}
+  - {sym: BUND,   excluded: "absent du lake Dukascopy (pas de futures taux)"}
+  - {sym: TNOTE,  excluded: "absent du lake Dukascopy (pas de futures taux)"}
+  - {sym: BTC,    excluded: "hors lake Dukascopy (panel binance séparé, non branché)"}
+  - {sym: ETH,    excluded: "absent du lake"}
+
+# Positionnement (composante pos du score TREND) : contrat COT (cot_map.yaml)
+# par actif. direct : pos = pctl-50 ; les paires FX se composent par devise
+# (futures CME cotés vs USD) : base - quote, /2 pour les croisées.
+cot_links:
+  GOLD:   {direct: GOLD}
+  SILVER: {direct: SILVER}
+  COPPER: {direct: COPPER}
+  WTI:    {direct: WTI}
+  NATGAS: {direct: NATGAS}
+  SPX:    {direct: E-MINI SPX}
+  NDX:    {direct: NDX MINI}
+  TNOTE:  {direct: T-NOTE 10A}
+  EURUSD: {base: EUR FX}
+  GBPUSD: {base: GBP FX}
+  AUDUSD: {base: AUD FX}
+  USDJPY: {quote: JPY FX}
+  USDCAD: {quote: CAD FX}
+  USDCHF: {quote: CHF FX}
+  EURJPY: {base: EUR FX, quote: JPY FX}
+  EURGBP: {base: EUR FX, quote: GBP FX}
+  AUDJPY: {base: AUD FX, quote: JPY FX}
+  # NZDUSD : pas de contrat NZD dans les 16 du front → pos neutre, flag

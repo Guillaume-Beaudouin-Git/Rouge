@@ -106,9 +106,47 @@ def intel_macro() -> dict:
     return envelope("macro")
 
 
+TREND_STALE_DAYS = 7  # cf. quotes_map.yaml stale_after_days
+
+
 @app.get("/api/intel/trend")
 def intel_trend() -> dict:
-    return envelope("trend")
+    """TREND réel (quotes Dukascopy + positionnement COT). Composantes mac
+    et flow neutres tant que leurs collecteurs ne sont pas branchés —
+    flaggées dans meta, jamais simulées. Actifs hors lake : ligne neutre
+    live=false, listés dans meta.excluded."""
+    try:
+        rows = db.query(
+            "SELECT cat, sym, name, f1, f2, g, mom, mac, pos, risk, flow, "
+            "d30, chg, live, pos_available, asof_session FROM v_trend"
+        )
+        expected = len(json.loads((DEMO_DIR / "trend.json").read_text(encoding="utf-8")))
+        if len(rows) != expected:
+            raise LookupError(f"v_trend : {len(rows)} actifs au lieu de {expected}")
+        asof = max(r["asof_session"] for r in rows).date()
+        data = [
+            {"cat": r["cat"], "sym": r["sym"], "name": r["name"],
+             "f1": r["f1"], "f2": r["f2"], "g": r["g"], "mom": r["mom"],
+             "mac": r["mac"], "pos": r["pos"], "risk": r["risk"],
+             "flow": r["flow"], "d30": r["d30"], "chg": r["chg"]}
+            for r in rows
+        ]
+        return {
+            "data": data,
+            "meta": {
+                "source": "dukascopy+cftc",
+                "asof": asof.isoformat(),
+                "stale": (date.today() - asof).days > TREND_STALE_DAYS,
+                "components": {"mom": True, "mac": False, "pos": True,
+                               "risk": True, "flow": False},
+                "excluded": sorted(r["sym"] for r in rows if not r["live"]),
+                "pos_missing": sorted(
+                    r["sym"] for r in rows if r["live"] and not r["pos_available"]),
+            },
+        }
+    except Exception as err:
+        log.warning("v_trend indisponible (%s) — repli fixture démo", err)
+        return envelope("trend")
 
 
 @app.get("/api/intel/fx")

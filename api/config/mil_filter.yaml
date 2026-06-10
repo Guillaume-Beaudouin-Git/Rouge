@@ -1,0 +1,43 @@
+# Filtrage vols militaires — HEURISTIQUE ASSUMÉE (couverture partielle par
+# nature : transpondeurs coupés, callsigns banalisés, plages hex non
+# exhaustives). Note de décision : docs/decisions/opensky_mil.md.
+
+# Préfixes de callsign militaires/gouvernementaux (communauté ADS-B :
+# bases tar1090 / ADSBexchange ; vérifiés présents dans states/all réel).
+callsign_prefixes:
+  - RCH      # USAF Air Mobility Command (Reach)
+  - LAGR     # USAF tanker (Lager)
+  - FORTE    # RQ-4/MQ-4 ISR
+  - DUKE     # US Army
+  - HAZE     # USAF
+  - MOJO     # USAF ISR
+  - CARD     # USAF
+  - RRR      # Royal Air Force
+  - ASCOT    # RAF transport
+  - KRF      # RAF
+  - NATO     # NATO (AWACS, tankers)
+  - GAF      # German Air Force
+  - GAM      # German Army
+  - CTM      # Armée de l'air française (COTAM)
+  - FAF      # French Air Force
+  - BAF      # Belgian Air Force
+  - PLF      # Polish Air Force
+  - NAF      # Netherlands AF
+  - IAM      # Aeronautica Militare (Italie)
+  - AME      # Ejército del Aire (Espagne)
+  - CFC      # Canadian Forces
+  - SHF      # Swedish AF
+  - HKY      # US Navy (Hawkeye…)
+  - REDEYE   # USAF ISR
+
+# Plages hex ICAO 24-bit allouées aux militaires (sources : allocations
+# ICAO publiques + listes communautaires ; on ne garde que les plages
+# documentées sans ambiguïté).
+hex_ranges:
+  - {from: "AE0000", to: "AFFFFF", note: "US DoD"}
+  - {from: "43C000", to: "43CFFF", note: "UK military"}
+  - {from: "3B7000", to: "3BFFFF", note: "France militaire"}
+
+# Cap de points servis — aligné sur le calque front (démo : 10 points)
+serve_max: 12
+stale_after_minutes: 30

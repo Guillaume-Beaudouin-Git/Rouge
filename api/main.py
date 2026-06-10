@@ -63,6 +63,7 @@ def health() -> dict:
 
 
 NEWS_STALE_MINUTES = 60  # cf. news_map.yaml stale_after_minutes
+MIL_STALE_MINUTES = 30   # cf. mil_filter.yaml stale_after_minutes
 
 
 @app.get("/api/monitor/layers")
@@ -72,27 +73,47 @@ def monitor_layers() -> dict:
     meta.blocks pour les badges par calque du front."""
     body = envelope("layers")
     blocks = {k: "demo" for k in ("news", "pm", "ais", "mil", "choke", "zones")}
-    try:
-        rows = db.query(
-            "SELECT lon, lat, w, title, source, ts, snapshot_ts FROM v_news"
-        )
-        if not rows:
-            raise LookupError("v_news vide")
+    asofs: list[datetime] = []
+
+    def _snap_age(rows: list[dict]) -> tuple[datetime, float]:
         snap = rows[0]["snapshot_ts"]
         snap = snap.replace(tzinfo=timezone.utc) if snap.tzinfo is None else snap.astimezone(timezone.utc)
-        age_min = (datetime.now(timezone.utc) - snap).total_seconds() / 60
-        stale = age_min > NEWS_STALE_MINUTES
+        return snap, (datetime.now(timezone.utc) - snap).total_seconds() / 60
+
+    try:
+        rows = db.query("SELECT lon, lat, w, title, source, ts, snapshot_ts FROM v_news")
+        if not rows:
+            raise LookupError("v_news vide")
+        snap, age_min = _snap_age(rows)
         body["data"]["news"] = [
             [r["lon"], r["lat"], r["w"], r["title"], r["source"],
              r["ts"].astimezone(timezone.utc).isoformat(timespec="seconds")]
             for r in rows
         ]
-        blocks["news"] = "stale" if stale else "live"
-        body["meta"] = {"source": "gdelt+demo",
-                        "asof": snap.isoformat(timespec="seconds"),
-                        "stale": stale}
+        blocks["news"] = "stale" if age_min > NEWS_STALE_MINUTES else "live"
+        asofs.append(snap)
     except Exception as err:
         log.warning("v_news indisponible (%s) — bloc news en fixture démo", err)
+
+    try:
+        rows = db.query("SELECT lon, lat, label, snapshot_ts FROM v_mil")
+        if not rows:
+            raise LookupError("v_mil vide")
+        snap, age_min = _snap_age(rows)
+        body["data"]["mil"] = [[r["lon"], r["lat"], r["label"]] for r in rows]
+        blocks["mil"] = "stale" if age_min > MIL_STALE_MINUTES else "live"
+        asofs.append(snap)
+    except Exception as err:
+        log.warning("v_mil indisponible (%s) — bloc mil en fixture démo", err)
+
+    live_blocks = [b for b in blocks.values() if b != "demo"]
+    if asofs:
+        body["meta"] = {
+            "source": "+".join(sorted({"gdelt" if blocks["news"] != "demo" else "",
+                                       "opensky" if blocks["mil"] != "demo" else ""} - {""})) + "+demo",
+            "asof": max(asofs).isoformat(timespec="seconds"),
+            "stale": all(b == "stale" for b in live_blocks),
+        }
     body["meta"]["blocks"] = blocks
     return body
 

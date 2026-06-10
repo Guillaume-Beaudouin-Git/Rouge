@@ -158,6 +158,15 @@ SELECT * FROM read_parquet('data/macro_scores/date=*/part-*.parquet')
 WHERE snapshot_ts = (SELECT max(snapshot_ts)
                      FROM read_parquet('data/macro_scores/date=*/part-*.parquet'));
 
+-- ============================================================ MIL
+-- Vols militaires (OpenSky, heuristique mil_filter.yaml) — dernier snapshot.
+CREATE OR REPLACE VIEW v_mil AS
+SELECT lon, lat, label, snapshot_ts
+FROM read_parquet('data/mil/date=*/part-*.parquet')
+WHERE snapshot_ts = (SELECT max(snapshot_ts)
+                     FROM read_parquet('data/mil/date=*/part-*.parquet'))
+ORDER BY label;
+
 -- ============================================================ à venir (P2)
 -- v_markets  → GET /api/intel/markets (BACKLOG : sources dédiées)
--- v_layers   → blocs ais/mil/zones (P2 en cours)
+-- v_layers   → blocs ais/zones (P2 en cours)

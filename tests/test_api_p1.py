@@ -27,6 +27,9 @@ ENDPOINTS = [
     "/api/intel/fx",
     "/api/intel/markets",
     "/api/intel/pm",
+    "/api/intel/season",
+    "/api/intel/tdi",
+    "/api/intel/micro",
 ]
 
 
@@ -167,6 +170,45 @@ def test_pm_shape() -> None:
         assert isinstance(m["vol"], str)
 
 
+# --------------------------------------------------------------- intel/season
+
+def test_season_shape() -> None:
+    data = get_data("/api/intel/season")
+    assert set(data) >= {"assets", "bias"}
+    assert len(data["assets"]) == 12
+    assert set(data["bias"]) == set(data["assets"])
+    for sym, months in data["bias"].items():
+        assert len(months) == 12 and all(is_num(v) for v in months)
+
+
+# ------------------------------------------------------------------ intel/tdi
+
+def test_tdi_shape() -> None:
+    rows = get_data("/api/intel/tdi")
+    assert len(rows) == 12
+    for t in rows:
+        assert set(t) == {"flux", "met", "z", "note"}
+        assert isinstance(t["flux"], str) and isinstance(t["met"], str)
+        assert is_num(t["z"]) and isinstance(t["note"], str)
+    zs = [abs(t["z"]) for t in rows]
+    assert zs == sorted(zs, reverse=True), "TDI trié par |z| décroissant"
+
+
+# ---------------------------------------------------------------- intel/micro
+
+def test_micro_shape() -> None:
+    data = get_data("/api/intel/micro")
+    assert set(data) >= {"assets", "leadlag"}
+    assert len(data["assets"]) == 20
+    for a in data["assets"]:
+        assert set(a) >= {"a", "row"}
+        assert len(a["row"]) == 24
+        assert all(is_num(v) and 0 <= v <= 100 for v in a["row"])
+    for l in data["leadlag"]:
+        assert set(l) >= {"pair", "lag", "corr"}
+        assert is_num(l["corr"]) and -1 <= l["corr"] <= 1
+
+
 # -------------------------------------------------------- front : same-origin
 
 def test_front_served_at_root() -> None:
@@ -186,6 +228,9 @@ FALLBACKS = [
     r"loadData\('/api/intel/fx',\{strength:FXS,pairs:PAIRS\}\)",
     r"loadData\('/api/intel/markets',MKT\)",
     r"loadData\('/api/intel/pm',PMARKETS\)",
+    r"loadData\('/api/intel/season',\{assets:SEAS_ASSETS,bias:SEAS_BIAS\}\)",
+    r"loadData\('/api/intel/tdi',TDI\)",
+    r"loadData\('/api/intel/micro',\{assets:MICRO,leadlag:LEADLAG\}\)",
 ]
 
 

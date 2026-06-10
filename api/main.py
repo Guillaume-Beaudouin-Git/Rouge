@@ -230,6 +230,21 @@ def intel_pm() -> dict:
         return envelope("pm")
 
 
+@app.get("/api/intel/season")
+def intel_season() -> dict:
+    return envelope("season")
+
+
+@app.get("/api/intel/tdi")
+def intel_tdi() -> dict:
+    return envelope("tdi")
+
+
+@app.get("/api/intel/micro")
+def intel_micro() -> dict:
+    return envelope("micro")
+
+
 @app.get("/", include_in_schema=False)
 def index() -> FileResponse:
     return FileResponse(FRONT_DIR / "rouge.html", media_type="text/html")

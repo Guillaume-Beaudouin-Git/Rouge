@@ -37,6 +37,9 @@ const out = new Function(src + `;
     fx: {strength: FXS, pairs: PAIRS},
     markets: MKT,
     pm: PMARKETS,
+    season: {assets: SEAS_ASSETS, bias: SEAS_BIAS},
+    tdi: TDI,
+    micro: {assets: MICRO, leadlag: LEADLAG.map(l => ({pair: l[0], lag: l[1], corr: l[2]}))},
   };
 `)();
 process.stdout.write(JSON.stringify(out));

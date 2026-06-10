@@ -1,0 +1,74 @@
+[
+ {
+  "flux": "AIS",
+  "met": "Transits détroit d’Ormuz / 24h",
+  "z": 3.1,
+  "note": "−18 % vs baseline 30j — réacheminements"
+ },
+ {
+  "flux": "GPS",
+  "met": "Brouillage GNSS · Méditerranée Est",
+  "z": 2.6,
+  "note": "cluster persistant, 4e jour"
+ },
+ {
+  "flux": "MIL",
+  "met": "Sorties ravitailleurs · flanc Est UE",
+  "z": 2.2,
+  "note": "rotation au-dessus de la normale"
+ },
+ {
+  "flux": "PM",
+  "met": "Vol. de probabilité · livre énergie",
+  "z": 2,
+  "note": "repricing rapide sur 6h"
+ },
+ {
+  "flux": "NEWS",
+  "met": "Mentions « électricité / datacenter »",
+  "z": 1.9,
+  "note": "goulot réseau en tête de cycle"
+ },
+ {
+  "flux": "NEWS",
+  "met": "Densité de dépêches · Sahel",
+  "z": 1.8,
+  "note": "pic régional, faible écho marché"
+ },
+ {
+  "flux": "SEIS",
+  "met": "Essaim sismique · Anatolie Est",
+  "z": 1.6,
+  "note": "M4+ ×3 en 48h (USGS)"
+ },
+ {
+  "flux": "FX",
+  "met": "Corrélation AUD ~ cuivre 20j",
+  "z": -1.6,
+  "note": "découplage inhabituel"
+ },
+ {
+  "flux": "FLOW",
+  "met": "Basis perp BTC · annualisé",
+  "z": 1.5,
+  "note": "retour de l’appétit levier"
+ },
+ {
+  "flux": "AIS",
+  "met": "Attente au mouillage · Singapour",
+  "z": -1.5,
+  "note": "décongestion plus rapide qu’attendu"
+ },
+ {
+  "flux": "VOL",
+  "met": "Skew 25Δ WTI 1M",
+  "z": 1.4,
+  "note": "demande de calls persistante"
+ },
+ {
+  "flux": "RATE",
+  "met": "Spread OIS-BCE sept. vs juil.",
+  "z": 1.3,
+  "note": "glissement du pricing de baisse"
+ }
+]

@@ -434,7 +434,7 @@ let PAIRS=[];G8.forEach((b,i)=>G8.forEach((q,j)=>{if(i<j){const sb=FXS.find(x=>x
 PAIRS.sort((a,b)=>Math.abs(b.diff)-Math.abs(a.diff));
 
 /* —— TDI —— */
-const TDI=[
+let TDI=[
  ['AIS','Transits détroit d\u2019Ormuz / 24h',3.1,'−18 % vs baseline 30j — réacheminements'],
  ['GPS','Brouillage GNSS · Méditerranée Est',2.6,'cluster persistant, 4e jour'],
  ['MIL','Sorties ravitailleurs · flanc Est UE',2.2,'rotation au-dessus de la normale'],
@@ -451,13 +451,13 @@ const TDI=[
 
 /* —— Micro —— */
 const MICRO_ASSETS=['EURUSD','GBPUSD','USDJPY','AUDUSD','USDCAD','EURJPY','SPX','NDX','DAX','NKY','GOLD','SILVER','COPPER','WTI','BRENT','NATGAS','BUND','TNOTE','BTC','ETH'];
-const MICRO=MICRO_ASSETS.map(a=>{const row=[];for(let h=0;h<24;h++){let base=18+(h>=7&&h<10?38:0)+(h>=12&&h<16?46:0)+(h>=0&&h<3&&(a==='NKY'||a==='USDJPY'||a==='BTC')?30:0);
+let MICRO=MICRO_ASSETS.map(a=>{const row=[];for(let h=0;h<24;h++){let base=18+(h>=7&&h<10?38:0)+(h>=12&&h<16?46:0)+(h>=0&&h<3&&(a==='NKY'||a==='USDJPY'||a==='BTC')?30:0);
   row.push(Math.min(99,Math.max(2,Math.floor(base+R(-14,16)))))}return {a,row}});
-const LEADLAG=[['NDX → SPX','1 min',0.84],['BRENT → WTI','1 min',0.78],['SPX → DAX','5 min',0.66],['BTC → ETH','1 min',0.81],['GOLD → SILVER','5 min',0.62],['USDJPY → NKY','15 min',0.57]];
+let LEADLAG=[['NDX → SPX','1 min',0.84],['BRENT → WTI','1 min',0.78],['SPX → DAX','5 min',0.66],['BTC → ETH','1 min',0.81],['GOLD → SILVER','5 min',0.62],['USDJPY → NKY','15 min',0.57]];
 
 /* —— Saisonnalité —— */
-const SEAS_ASSETS=['SPX','NDX','DAX','GOLD','WTI','NATGAS','EURUSD','USDJPY','AUDUSD','COPPER','BTC','BUND'];
-const SEAS_BIAS={SPX:[1.1,.2,.9,1.4,.4,.1,.9,-.3,-1.2,.8,1.7,1.3],NDX:[1.5,.3,.8,1.6,.7,.4,1.3,-.2,-1.5,.9,2.1,1.2],DAX:[.8,.4,1.2,1.5,.2,-.2,.6,-.9,-1.4,1.0,1.6,1.1],GOLD:[1.6,.5,-.4,.3,.2,.1,.6,1.2,.9,.2,.4,.8],WTI:[.4,1.1,1.6,1.9,.8,.3,.9,.5,-.7,-1.0,-.8,.2],NATGAS:[-.6,-1.1,-.9,.3,.7,.9,1.0,1.2,1.8,1.4,.5,-.2],EURUSD:[-.3,.1,.2,.5,-.2,.3,.4,-.1,-.4,.2,.3,.6],USDJPY:[.4,.3,-.2,-.4,.1,.2,-.3,-.5,.2,.4,.3,-.1],AUDUSD:[.2,.3,.4,.6,-.4,-.2,.3,-.3,-.5,.4,.5,.3],COPPER:[.9,1.2,.6,.8,-.3,-.5,.4,-.6,-.4,.5,.8,.7],BTC:[2.1,3.4,1.2,2.8,-1.4,-.8,1.9,-2.2,-3.1,3.8,4.6,2.4],BUND:[.2,-.1,.1,-.2,.3,.4,.2,.5,.1,-.2,.1,.3]};
+let SEAS_ASSETS=['SPX','NDX','DAX','GOLD','WTI','NATGAS','EURUSD','USDJPY','AUDUSD','COPPER','BTC','BUND'];
+let SEAS_BIAS={SPX:[1.1,.2,.9,1.4,.4,.1,.9,-.3,-1.2,.8,1.7,1.3],NDX:[1.5,.3,.8,1.6,.7,.4,1.3,-.2,-1.5,.9,2.1,1.2],DAX:[.8,.4,1.2,1.5,.2,-.2,.6,-.9,-1.4,1.0,1.6,1.1],GOLD:[1.6,.5,-.4,.3,.2,.1,.6,1.2,.9,.2,.4,.8],WTI:[.4,1.1,1.6,1.9,.8,.3,.9,.5,-.7,-1.0,-.8,.2],NATGAS:[-.6,-1.1,-.9,.3,.7,.9,1.0,1.2,1.8,1.4,.5,-.2],EURUSD:[-.3,.1,.2,.5,-.2,.3,.4,-.1,-.4,.2,.3,.6],USDJPY:[.4,.3,-.2,-.4,.1,.2,-.3,-.5,.2,.4,.3,-.1],AUDUSD:[.2,.3,.4,.6,-.4,-.2,.3,-.3,-.5,.4,.5,.3],COPPER:[.9,1.2,.6,.8,-.3,-.5,.4,-.6,-.4,.5,.8,.7],BTC:[2.1,3.4,1.2,2.8,-1.4,-.8,1.9,-2.2,-3.1,3.8,4.6,2.4],BUND:[.2,-.1,.1,-.2,.3,.4,.2,.5,.1,-.2,.1,.3]};
 const MONTHS=['JAN','FÉV','MAR','AVR','MAI','JUN','JUL','AOÛ','SEP','OCT','NOV','DÉC'];
 
 /* —— Marchés de prédiction —— */
@@ -505,7 +505,7 @@ const ECON={US:{n:'États-Unis',pib:2.1,cpi:2.8,tx:4.25,cho:4.1},CN:{n:'Chine',p
 /* ================= CÂBLAGE API (P1) ================= */
 /* Chaque module câblé tente l'API same-origin et retombe sur sa constante
    démo en cas d'échec/timeout. États : demo | live | stale. */
-const DATA_STATE={layers:'demo',cot:'demo',macro:'demo',trend:'demo',fx:'demo',markets:'demo',pm:'demo'};
+const DATA_STATE={layers:'demo',cot:'demo',macro:'demo',trend:'demo',fx:'demo',markets:'demo',pm:'demo',season:'demo',tdi:'demo',micro:'demo'};
 function tag(k){const s=DATA_STATE[k];return s==='live'?'<span class="demo-tag live">LIVE</span>':s==='stale'?'<span class="demo-tag">STALE</span>':'<span class="demo-tag">DÉMO</span>'}
 function srcNote(k){const s=DATA_STATE[k];return s==='live'?'':s==='stale'?' (stale)':' (démo)'}
 async function loadData(endpoint,demoConst){
@@ -797,7 +797,7 @@ function rFx(){
    <td>${p.conflict?'<span class="vd bear">CONFLIT</span>':Math.sign(p.diff)===p.trend?'<span class="vd bull">ALIGNÉ</span>':'<span class="vd">—</span>'}</td></tr>`).join('')}
   </tbody></table></div>`}
 
-function rTdi(){return title('TDI','Divergence temporelle : chaque flux comparé à sa propre baseline 30 jours, en z-score. Au-delà de |1,5|, quelque chose sort de l\u2019ordinaire — pas forcément tradable, toujours bon à savoir.','/INTEL/TDI · 12 FLUX · <span class="demo-tag">DÉMO</span>')+
+function rTdi(){return title('TDI','Divergence temporelle : chaque flux comparé à sa propre baseline 30 jours, en z-score. Au-delà de |1,5|, quelque chose sort de l\u2019ordinaire — pas forcément tradable, toujours bon à savoir.','/INTEL/TDI · '+TDI.length+' FLUX · '+tag('tdi'))+
   `<div class="tblwrap"><table><thead><tr><th>FLUX</th><th>MÉTRIQUE</th><th>Z-SCORE</th><th></th><th>LECTURE</th></tr></thead><tbody>
   ${TDI.map(t=>`<tr><td><span class="vd ${Math.abs(t.z)>=2?'bear':''}">${t.flux}</span></td><td style="text-align:left;font-family:var(--sans)">${t.met}</td>
    <td class="score ${Math.abs(t.z)>=1.5?(t.z>0?'dn':'nt'):'nt'}" style="${Math.abs(t.z)>=2?'color:var(--rouge)':''}">${f2(t.z)}</td><td>${barHTML(t.z,3.5)}</td>
@@ -806,7 +806,7 @@ function rTdi(){return title('TDI','Divergence temporelle : chaque flux comparé
 
 function rMicro(){
   const heat=v=>v>=85?'var(--rouge)':v>=65?'var(--rouge-deep)':v>=40?'#3A2320':'var(--ink3)';
-  return title('Micro','Régimes de volatilité intraday : percentile de vol réalisée par heure UTC (fenêtre 10 j), et qui mène qui à la minute. Là où le calme se rompt en premier.','/INTEL/MICRO · 20 ACTIFS · BARRES 1M · <span class="demo-tag">DÉMO</span>')+
+  return title('Micro','Régimes de volatilité intraday : percentile de vol réalisée par heure UTC (fenêtre 10 j), et qui mène qui à la minute. Là où le calme se rompt en premier.','/INTEL/MICRO · '+MICRO.length+' ACTIFS · '+tag('micro'))+
   `<div class="panel" style="margin-bottom:18px;overflow-x:auto"><div class="lbl" style="margin-bottom:10px">VOL RÉALISÉE — PERCENTILE PAR HEURE UTC</div>
    <div class="hm" style="grid-template-columns:70px repeat(24,1fr);min-width:760px">
    <div></div>${Array.from({length:24},(_,h)=>`<div class="collbl">${h}</div>`).join('')}
@@ -820,7 +820,7 @@ function rMicro(){
 function rSeason(){
   const cur=5; // juin (index 5)
   const heat=v=>v>=1.5?'var(--rouge)':v>=.6?'var(--rouge-deep)':v>=0?'#3A2320':v>=-1?'#1E2228':'var(--steel-dim)';
-  return title('Saisonnalité','Rendement mensuel moyen par actif (fenêtre longue, données démo). Une saisonnalité n\u2019est jamais un signal seul — c\u2019est un vent de face ou de dos à pondérer.','/INTEL/SAISONNALITÉ · <span class="demo-tag">DÉMO</span>')+
+  return title('Saisonnalité','Rendement mensuel moyen par actif (fenêtre longue, données démo). Une saisonnalité n\u2019est jamais un signal seul — c\u2019est un vent de face ou de dos à pondérer.','/INTEL/SAISONNALITÉ · '+tag('season'))+
   `<div class="panel" style="overflow-x:auto"><div class="hm" style="grid-template-columns:80px repeat(12,1fr);min-width:680px">
    <div></div>${MONTHS.map((m,i)=>`<div class="collbl" style="${i===cur?'color:var(--rouge)':''}">${m}</div>`).join('')}
    ${SEAS_ASSETS.map(a=>`<div class="rowlbl">${a}</div>${SEAS_BIAS[a].map((v,i)=>`<div class="cell" style="background:${heat(v)};${i===cur?'outline:1px solid var(--rouge)':''};color:${Math.abs(v)>=1?'var(--bone)':'var(--bone-faint)'}" title="${a} · ${MONTHS[i]} : ${f1(v)} % en moyenne">${v.toFixed(1)}</div>`).join('')}`).join('')}</div>
@@ -886,14 +886,17 @@ function renderDocs(){
 
 /* ================= INIT ================= */
 const DATA_READY=(async()=>{
-  const [layers,cot,macro,trend,fx,markets,pm]=await Promise.all([
+  const [layers,cot,macro,trend,fx,markets,pm,season,tdi,micro]=await Promise.all([
     loadData('/api/monitor/layers',{news:NEWSPTS,pm:PMARKETS,ais:AIS,mil:MILPTS,choke:CHOKE,zones:ZONES}),
     loadData('/api/intel/cot',COT),
     loadData('/api/intel/macro',{events:MACRO,scores:SCORE}),
     loadData('/api/intel/trend',TREND),
     loadData('/api/intel/fx',{strength:FXS,pairs:PAIRS}),
     loadData('/api/intel/markets',MKT),
-    loadData('/api/intel/pm',PMARKETS)
+    loadData('/api/intel/pm',PMARKETS),
+    loadData('/api/intel/season',{assets:SEAS_ASSETS,bias:SEAS_BIAS}),
+    loadData('/api/intel/tdi',TDI),
+    loadData('/api/intel/micro',{assets:MICRO,leadlag:LEADLAG})
   ]);
   ZONES=layers.data.zones;NEWSPTS=layers.data.news;AIS=layers.data.ais;MILPTS=layers.data.mil;CHOKE=layers.data.choke;
   DATA_STATE.layers=layers.status;
@@ -903,6 +906,9 @@ const DATA_READY=(async()=>{
   FXS=fx.data.strength;PAIRS=fx.data.pairs;DATA_STATE.fx=fx.status;
   MKT=markets.data;DATA_STATE.markets=markets.status;
   PMARKETS=pm.data;DATA_STATE.pm=pm.status;
+  SEAS_ASSETS=season.data.assets;SEAS_BIAS=season.data.bias;DATA_STATE.season=season.status;
+  TDI=tdi.data;DATA_STATE.tdi=tdi.status;
+  MICRO=micro.data.assets;LEADLAG=micro.data.leadlag.map(l=>l.pair?[l.pair,l.lag,l.corr]:l);DATA_STATE.micro=micro.status;
   /* rail monitor : compteurs + source PAR BLOC (meta.blocks de l'endpoint
      layers : un calque peut être live pendant que les autres restent démo ;
      pm suit l'endpoint intel/pm) */

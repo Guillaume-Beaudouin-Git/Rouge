@@ -16,13 +16,17 @@ PY=venv/bin/python
 
 loop() {
   echo "[interim] boucle démarrée pid=$$" >> "$LOG"
-  local last_news=0
+  local last_news=0 last_macro=0
   while true; do
     now=$(date +%s)
     "$PY" -m collectors.pm_collector >> "$LOG" 2>&1 || true
     if (( now - last_news >= 900 )); then
       "$PY" -m collectors.news_collector >> "$LOG" 2>&1 || true
       last_news=$now
+    fi
+    if (( now - last_macro >= 21600 )); then   # 6 h ⊇ 1 pull/j + re-pull J+1
+      "$PY" -m collectors.macro_collector >> "$LOG" 2>&1 || true
+      last_macro=$now
     fi
     sleep 300
   done

@@ -75,6 +75,24 @@ au fil des branchements. `meta.components`, `meta.excluded` et
 `meta.pos_missing` détaillent l'état par composante et par actif.
 Backlog des actifs/alimentations manquants : [BACKLOG.md](BACKLOG.md).
 
+## Macro : FairEconomy et hit-rate progressif
+
+Choix de provider tranché empiriquement (2026-06-10) : TradingEconomics a
+supprimé le compte invité (HTTP 410) et FMP a verrouillé le calendrier
+derrière le payant même avec clé (402/403) → **FairEconomy** (miroir JSON
+ForexFactory, gratuit, sans clé). Deux limites assumées :
+
+- **fenêtre = semaine courante** (le feed nextweek n'existe pas) : la vue
+  affiche moins que les 14 jours du design, `meta.window_days` fait foi ;
+- **pas de champ actual** : le réalisé d'un événement est dérivé du
+  `previous` de l'occurrence suivante de la même série. Règle de vintage :
+  `actual_first_seen` est gelé à la première observation (les révisions
+  vont dans `actual_revised`), et beatZ/missZ/hit se calculent
+  exclusivement sur le premier print vs consensus. Conséquence : le
+  hit-rate **se remplit progressivement au fil des collectes**
+  (`meta.history_n` compte les surprises accumulées — 0 au premier jour,
+  les séries mensuelles mettent ~2 mois à produire leurs premiers z).
+
 ## Microstructure : heures UTC et DST
 
 La heatmap de vol horaire est étiquetée en **UTC fixe**. Les sessions de

@@ -145,9 +145,19 @@ WHERE asof_session = (SELECT max(asof_session)
                       FROM read_parquet('data/micro_leadlag/date=*/part.parquet'))
 ORDER BY abs(corr) DESC NULLS LAST;
 
+-- ============================================================ MACRO
+-- Calendrier FairEconomy + stats de surprise vintage (macro_collector).
+CREATE OR REPLACE VIEW v_macro_events AS
+SELECT * FROM read_parquet('data/macro_events/date=*/part-*.parquet')
+WHERE snapshot_ts = (SELECT max(snapshot_ts)
+                     FROM read_parquet('data/macro_events/date=*/part-*.parquet'))
+ORDER BY d, time;
+
+CREATE OR REPLACE VIEW v_macro_scores AS
+SELECT * FROM read_parquet('data/macro_scores/date=*/part-*.parquet')
+WHERE snapshot_ts = (SELECT max(snapshot_ts)
+                     FROM read_parquet('data/macro_scores/date=*/part-*.parquet'));
+
 -- ============================================================ à venir (P2)
--- v_macro    → GET /api/intel/macro
--- v_trend    → GET /api/intel/trend
--- v_fx       → GET /api/intel/fx
--- v_markets  → GET /api/intel/markets
--- v_layers   → GET /api/monitor/layers (news, pm, ais, mil, choke, zones)
+-- v_markets  → GET /api/intel/markets (BACKLOG : sources dédiées)
+-- v_layers   → blocs ais/mil/zones (P2 en cours)

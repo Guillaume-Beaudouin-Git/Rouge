@@ -131,9 +131,40 @@ def intel_cot() -> dict:
         return envelope("cot")
 
 
+MACRO_STALE_HOURS = 36  # cadence 1/jour + re-pull J+1
+
+
 @app.get("/api/intel/macro")
 def intel_macro() -> dict:
-    return envelope("macro")
+    """Calendrier FairEconomy + surprises vintage (premier print gelé).
+    Le hit-rate se remplit au fil des collectes ; fenêtre bornée à la
+    semaine courante (limite du feed). Repli démo si indisponible."""
+    try:
+        events = db.query("SELECT d, dt, ccy, iso, name, tier, time, prev, cons, "
+                          "beatZ, missZ, hit, n, snapshot_ts FROM v_macro_events")
+        scores = db.query("SELECT ccy, iso, next, beatZ, missZ, beatPct, n, mom, "
+                          "streak, top FROM v_macro_scores")
+        if not events or len(scores) != 8:
+            raise LookupError(f"v_macro : {len(events)} événements / {len(scores)} scores")
+        snap = events[0]["snapshot_ts"]
+        snap = snap.replace(tzinfo=timezone.utc) if snap.tzinfo is None else snap.astimezone(timezone.utc)
+        age_h = (datetime.now(timezone.utc) - snap).total_seconds() / 3600
+        data_events = [{k: e[k] for k in ("d", "dt", "ccy", "iso", "name", "tier",
+                                          "time", "prev", "cons", "beatZ", "missZ",
+                                          "hit", "n")} for e in events]
+        return {
+            "data": {"events": data_events, "scores": scores},
+            "meta": {
+                "source": "faireconomy",
+                "asof": snap.isoformat(timespec="seconds"),
+                "stale": age_h > MACRO_STALE_HOURS,
+                "window_days": max(e["d"] for e in events),
+                "history_n": sum(s["n"] for s in scores),
+            },
+        }
+    except Exception as err:
+        log.warning("v_macro indisponible (%s) — repli fixture démo", err)
+        return envelope("macro")
 
 
 TREND_STALE_DAYS = 7  # cf. quotes_map.yaml stale_after_days

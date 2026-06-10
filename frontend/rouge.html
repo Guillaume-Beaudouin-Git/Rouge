@@ -776,7 +776,7 @@ function rMacro(){
    <div class="lbl" style="margin-bottom:8px">TIMELINE</div>
    <div class="tblwrap"><table><thead><tr><th>JOUR</th><th>HEURE UTC</th><th>PAYS</th><th>PUBLICATION</th><th>TIER</th><th>PRÉC.</th><th>CONS.</th><th>BEAT Z</th><th>MISS Z</th><th>HIT %</th><th>N</th></tr></thead><tbody>
    ${MACRO.slice(0,30).map(m=>`<tr><td>${fmtD(m.dt)}</td><td>${m.time}</td><td><span class="flag">${flag(m.iso)}</span>${m.ccy}</td><td style="text-align:left;font-family:var(--sans)">${m.name}</td>
-    <td><span class="tier ${m.tier===3?'t3':''}">T${m.tier}</span></td><td>${m.prev}</td><td>${m.cons??'—'}</td>
+    <td><span class="tier ${m.tier===3?'t3':''}">T${m.tier}</span></td><td>${m.prev??'—'}</td><td>${m.cons??'—'}</td>
     <td class="up">+${m.beatZ}</td><td class="dn">${m.missZ}</td><td>${m.hit} %</td><td>${m.n}</td></tr>`).join('')}
    </tbody></table></div>`}
 
